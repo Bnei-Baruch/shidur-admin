@@ -97,6 +97,13 @@ export const channels_options = [
     { key: '2', text: '2', value: '2' },
 ];
 
+export const langch_options = [
+    { key: '27', text: '27', value: '27' },
+    { key: '24', text: '24', value: '24' },
+    { key: '8', text: '8', value: '8' },
+    { key: '2', text: '2', value: '2' },
+];
+
 export const encstr_options = [
     { key: 'ffmpeg', text: 'FFMPEG', value: 'ffmpeg' },
     { key: 'gstreamer', text: 'GST', value: 'gstreamer' },

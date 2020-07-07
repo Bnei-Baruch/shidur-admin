@@ -5,7 +5,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import {Divider, Table, Segment, Label, Dropdown, Select, Message, Button, Icon} from 'semantic-ui-react'
 import {
     getWorkflowData,
-    channels_options,
+    langch_options,
     streamFetcher,
     vres_options,
     WFSRV_BACKEND
@@ -198,7 +198,7 @@ class Playouts extends Component {
                             <Table.Cell>Channels</Table.Cell>
                             <Table.Cell>
                                 <Select disabled={!id}
-                                        compact options={channels_options}
+                                        compact options={langch_options}
                                         value={id ? playouts[id].jsonst.channels : ""}
                                         onChange={(e, {value}) => this.setJsonState("channels", value)}
                                 />
