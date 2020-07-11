@@ -9,6 +9,7 @@ import Captures from "./components/Captures";
 import Playouts from "./components/Playouts";
 import Settings from "./components/Settings";
 import Workflow from "./components/Workflow";
+import WebRTC from "./components/WebRTC";
 //import UDP from "./components/UDP";
 
 class App extends Component {
@@ -68,27 +69,27 @@ class App extends Component {
                             id={encoder_id}
                             encoders={encoders} />
               </Tab.Pane> },
-          { menuItem: { key: 'decoder', icon: 'record', content: 'Decoders' },
-              render: () => <Tab.Pane attached={false} >
-                  <Decoders jsonState={this.setJsonState}
-                            idState={this.setIdState}
-                            id={decoder_id}
-                            decoders={decoders} />
-              </Tab.Pane> },
-          { menuItem: { key: 'capture', icon: 'film', content: 'Captures' },
-              render: () => <Tab.Pane attached={false} >
-                  <Captures jsonState={this.setJsonState}
-                            idState={this.setIdState}
-                            id={capture_id}
-                            captures={captures} />
-              </Tab.Pane> },
-          { menuItem: { key: 'workflow', icon: 'hdd', content: 'Workflow' },
-              render: () => <Tab.Pane attached={false} >
-                  <Workflow jsonState={this.setJsonState}
-                            idState={this.setIdState}
-                            id={workflow_id}
-                            workflows={workflows} />
-              </Tab.Pane> },
+          // { menuItem: { key: 'decoder', icon: 'record', content: 'Decoders' },
+          //     render: () => <Tab.Pane attached={false} >
+          //         <Decoders jsonState={this.setJsonState}
+          //                   idState={this.setIdState}
+          //                   id={decoder_id}
+          //                   decoders={decoders} />
+          //     </Tab.Pane> },
+          // { menuItem: { key: 'capture', icon: 'film', content: 'Captures' },
+          //     render: () => <Tab.Pane attached={false} >
+          //         <Captures jsonState={this.setJsonState}
+          //                   idState={this.setIdState}
+          //                   id={capture_id}
+          //                   captures={captures} />
+          //     </Tab.Pane> },
+          // { menuItem: { key: 'workflow', icon: 'hdd', content: 'Workflow' },
+          //     render: () => <Tab.Pane attached={false} >
+          //         <Workflow jsonState={this.setJsonState}
+          //                   idState={this.setIdState}
+          //                   id={workflow_id}
+          //                   workflows={workflows} />
+          //     </Tab.Pane> },
           { menuItem: { key: 'playout', icon: 'play', content: 'Playout' },
               render: () => <Tab.Pane attached={false} >
                   <Playouts jsonState={this.setJsonState}
@@ -105,10 +106,10 @@ class App extends Component {
                             playouts={playouts}
                             workflows={workflows}/>
               </Tab.Pane> },
-          // { menuItem: { key: 'udp', icon: 'network', content: 'UDP' },
-          //     render: () => <Tab.Pane attached={false} >
-          //         <UDP id={null} />
-          //     </Tab.Pane> },
+          { menuItem: { key: 'webrtc', icon: 'globe', content: 'WebRTC' },
+              render: () => <Tab.Pane attached={false} >
+                  <WebRTC />
+              </Tab.Pane> },
       ];
 
     return (
