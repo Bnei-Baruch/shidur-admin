@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {Tab, Table} from 'semantic-ui-react'
+import {Tab, Table, Icon} from 'semantic-ui-react'
 import {getData} from "../shared/tools";
 
 
@@ -11,18 +11,21 @@ class WebRTC extends Component {
         trlout: {},
         video: {},
         special: {},
+        servers: {},
     };
 
     componentDidMount() {
         getData(`webrtc`, (webrtc) => {
             console.log(":: Got webrtc : ",webrtc);
-            const {sadna,sound,trlout,video,special} = webrtc;
-            this.setState({sadna,sound,trlout,video,special});
+            const {sadna,sound,trlout,video,special,servers} = webrtc;
+            this.setState({sadna,sound,trlout,video,special,servers});
         });
     };
 
     render() {
-        const {sadna,sound,trlout,video,special} = this.state;
+        const {sadna,sound,trlout,video,special,servers} = this.state;
+        const v = (<Icon color='green' name='checkmark' />);
+        const x = (<Icon color='red' name='close' />);
 
         let sadna_options = Object.keys(sadna).map((id, i) => {
             let conf = sadna[id];
@@ -84,6 +87,18 @@ class WebRTC extends Component {
                     <Table.Cell>{conf.proxy_port}</Table.Cell>
                     <Table.Cell>{conf.janus_port}</Table.Cell>
                     <Table.Cell>{conf.janus_id}</Table.Cell>
+                </Table.Row>
+            )
+        });
+
+        let servers_options = Object.keys(servers).map((id, i) => {
+            let conf = servers[id];
+            return (
+                <Table.Row key={i} className="monitor_tr">
+                    <Table.Cell>{conf.title}</Table.Cell>
+                    <Table.Cell>{conf.dns}</Table.Cell>
+                    <Table.Cell>{conf.ip}</Table.Cell>
+                    <Table.Cell>{conf.enabled ? v : x}</Table.Cell>
                 </Table.Row>
             )
         });
@@ -175,6 +190,23 @@ class WebRTC extends Component {
 
                             <Table.Body>
                                 {special_options}
+                            </Table.Body>
+                        </Table>
+                    </Tab.Pane> },
+            { menuItem: 'Servers', render: () =>
+                    <Tab.Pane>
+                        <Table compact='very' basic size='small'>
+                            <Table.Header>
+                                <Table.Row className='table_header'>
+                                    <Table.HeaderCell width={1}>Title</Table.HeaderCell>
+                                    <Table.HeaderCell width={1}>DNS</Table.HeaderCell>
+                                    <Table.HeaderCell width={1}>IP</Table.HeaderCell>
+                                    <Table.HeaderCell width={1}>Enabled</Table.HeaderCell>
+                                </Table.Row>
+                            </Table.Header>
+
+                            <Table.Body>
+                                {servers_options}
                             </Table.Body>
                         </Table>
                     </Tab.Pane> },
