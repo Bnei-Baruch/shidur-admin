@@ -96,3 +96,46 @@
 .admin_table {
     cursor: pointer!important;
 }
+
+.monitor_tr {
+    background: #eaeaea;
+    font-weight: bolder;
+    cursor: pointer!important;
+}
+
+.settings_btn {
+    position: absolute;
+    padding: .38571429em .47571429em .48571429em!important;
+    font-size: .68571429rem!important;
+    margin-top: 8px!important;
+}
+
+.ui.table td.positive, .ui.table tr.positive {
+    background: #e1e6d4!important;
+    font-weight: bolder;
+}
+
+.ui.table tr:hover {
+    background: #e1e6d4!important;
+}
+
+.ui.table td.active, .ui.table tr.active {
+    background: #efeff5!important;
+    color: #287ab7!important;
+}
+
+.ui[class*="very compact"].table td {
+    padding: .1em .3em!important;
+}
+
+.ui.table td.one.wide, .ui.table th.one.wide {
+    width: 2.5%;
+}
+
+.table_header {
+    background: #dad4c1;
+}
+
+.ui.table thead th {
+    padding: .2em .3em;
+}

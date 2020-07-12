@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {Tab, Table, Icon} from 'semantic-ui-react'
+import {Tab, Table, Icon, Button} from 'semantic-ui-react'
 import {getData} from "../shared/tools";
 
 
@@ -120,6 +120,7 @@ class WebRTC extends Component {
                             {video_options}
                         </Table.Body>
                     </Table>
+                     <Button size="mini" fluid>Add....</Button>
                 </Tab.Pane> },
             { menuItem: 'Sound', render: () =>
                     <Tab.Pane>
@@ -138,6 +139,7 @@ class WebRTC extends Component {
                                 {sound_options}
                             </Table.Body>
                         </Table>
+                        <Button size="mini" fluid>Add....</Button>
                     </Tab.Pane> },
             { menuItem: 'Sadna', render: () =>
                     <Tab.Pane>
@@ -156,6 +158,7 @@ class WebRTC extends Component {
                                 {sadna_options}
                             </Table.Body>
                         </Table>
+                        <Button size="mini" fluid>Add....</Button>
                     </Tab.Pane> },
             { menuItem: 'Trlout', render: () =>
                     <Tab.Pane>
@@ -174,6 +177,7 @@ class WebRTC extends Component {
                                 {trlout_options}
                             </Table.Body>
                         </Table>
+                        <Button size="mini" fluid>Add....</Button>
                     </Tab.Pane> },
             { menuItem: 'Special', render: () =>
                     <Tab.Pane>
@@ -192,6 +196,7 @@ class WebRTC extends Component {
                                 {special_options}
                             </Table.Body>
                         </Table>
+                        <Button size="mini" fluid>Add....</Button>
                     </Tab.Pane> },
             { menuItem: 'Servers', render: () =>
                     <Tab.Pane>
@@ -209,6 +214,7 @@ class WebRTC extends Component {
                                 {servers_options}
                             </Table.Body>
                         </Table>
+                        <Button size="mini" fluid>Add....</Button>
                     </Tab.Pane> },
         ]
 
