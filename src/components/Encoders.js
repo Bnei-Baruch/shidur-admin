@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {Divider, Table, Segment, Label, Dropdown, Select, Message, Button, List} from 'semantic-ui-react'
+import {Divider, Table, Segment, Label, Dropdown, Select, Message, Button, List, Menu} from 'semantic-ui-react'
 import {channels_options, vres_options, vrate_options, arate_options, protocol_options, encstr_options, dest_options, encrec_options, streamFetcher} from "../shared/tools";
 
 
@@ -197,33 +197,39 @@ class Encoders extends Component {
                     </Table.Footer>
                 </Table>
                 <Message className='or_buttons' >
-                    <Button.Group >
-                        <Button positive disabled={status !== "Off"}
-                            onClick={this.startEncoder}>Start</Button>
-                        <Button.Or text='enc' />
-                        <Button negative disabled={status !== "On"}
-                                onClick={this.stopEncoder}>Stop</Button>
-                    </Button.Group>
-                    <List className='stat' size='small'>
-                        <List.Item>
-                            <List.Icon name='microchip' />
-                            <List.Content
-                                className={parseInt(stat.cpu) > 90 ? "warning" : ""}>
-                                CPU: <b>{stat.cpu}</b></List.Content>
-                        </List.Item>
-                        <List.Item>
-                            <List.Icon name='server' />
-                            <List.Content
-                                className={parseInt(stat.hdd) > 90 ? "warning" : ""}>
-                                HDD: <b>{stat.hdd}</b></List.Content>
-                        </List.Item>
-                        <List.Item>
-                            <List.Icon name='thermometer' />
-                            <List.Content
-                                className={parseInt(stat.temp) > 80 ? "warning" : ""}>
-                                TMP: <b>{stat.temp}</b></List.Content>
-                        </List.Item>
-                    </List>
+                    <Menu fluid secondary text>
+                        <Menu.Item>
+                            <Button.Group >
+                                <Button positive disabled={status !== "Off"}
+                                        onClick={this.startEncoder}>Start</Button>
+                                <Button.Or text='enc' />
+                                <Button negative disabled={status !== "On"}
+                                        onClick={this.stopEncoder}>Stop</Button>
+                            </Button.Group>
+                        </Menu.Item>
+                        <Menu.Item position='right'>
+                            <List className='stat' size='small'>
+                                <List.Item>
+                                    <List.Icon name='microchip' />
+                                    <List.Content
+                                        className={parseInt(stat.cpu) > 90 ? "warning" : ""}>
+                                        CPU: <b>{stat.cpu}</b></List.Content>
+                                </List.Item>
+                                <List.Item>
+                                    <List.Icon name='server' />
+                                    <List.Content
+                                        className={parseInt(stat.hdd) > 90 ? "warning" : ""}>
+                                        HDD: <b>{stat.hdd}</b></List.Content>
+                                </List.Item>
+                                <List.Item>
+                                    <List.Icon name='thermometer' />
+                                    <List.Content
+                                        className={parseInt(stat.temp) > 80 ? "warning" : ""}>
+                                        TMP: <b>{stat.temp}</b></List.Content>
+                                </List.Item>
+                            </List>
+                        </Menu.Item>
+                    </Menu>
                 </Message>
             </Segment>
         );
