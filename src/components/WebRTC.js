@@ -1,5 +1,5 @@
-import React, {Component} from 'react'
-import {Tab, Table, Icon, Button} from 'semantic-ui-react'
+import React, {Component, Fragment} from 'react'
+import {Tab, Table, Icon, Button, Modal, Header, Form, Message, Input} from 'semantic-ui-react'
 import {getData} from "../shared/tools";
 
 
@@ -12,6 +12,7 @@ class WebRTC extends Component {
         video: {},
         special: {},
         servers: {},
+        open: false
     };
 
     componentDidMount() {
@@ -22,8 +23,12 @@ class WebRTC extends Component {
         });
     };
 
+    addNew = (source) => {
+        this.setState({open: true})
+    }
+
     render() {
-        const {sadna,sound,trlout,video,special,servers} = this.state;
+        const {sadna,sound,trlout,video,special,servers,open} = this.state;
         const v = (<Icon color='green' name='checkmark' />);
         const x = (<Icon color='red' name='close' />);
 
@@ -120,7 +125,7 @@ class WebRTC extends Component {
                             {video_options}
                         </Table.Body>
                     </Table>
-                     <Button size="mini" fluid>Add....</Button>
+                     <Button size="mini" fluid onClick={() => this.addNew('video')}>Add....</Button>
                 </Tab.Pane> },
             { menuItem: 'Sound', render: () =>
                     <Tab.Pane>
@@ -139,7 +144,7 @@ class WebRTC extends Component {
                                 {sound_options}
                             </Table.Body>
                         </Table>
-                        <Button size="mini" fluid>Add....</Button>
+                        <Button size="mini" fluid onClick={() => this.addNew('sound')}>Add....</Button>
                     </Tab.Pane> },
             { menuItem: 'Sadna', render: () =>
                     <Tab.Pane>
@@ -158,7 +163,7 @@ class WebRTC extends Component {
                                 {sadna_options}
                             </Table.Body>
                         </Table>
-                        <Button size="mini" fluid>Add....</Button>
+                        <Button size="mini" fluid onClick={() => this.addNew('sadna')}>Add....</Button>
                     </Tab.Pane> },
             { menuItem: 'Trlout', render: () =>
                     <Tab.Pane>
@@ -177,7 +182,7 @@ class WebRTC extends Component {
                                 {trlout_options}
                             </Table.Body>
                         </Table>
-                        <Button size="mini" fluid>Add....</Button>
+                        <Button size="mini" fluid onClick={() => this.addNew('trlout')}>Add....</Button>
                     </Tab.Pane> },
             { menuItem: 'Special', render: () =>
                     <Tab.Pane>
@@ -196,7 +201,7 @@ class WebRTC extends Component {
                                 {special_options}
                             </Table.Body>
                         </Table>
-                        <Button size="mini" fluid>Add....</Button>
+                        <Button size="mini" fluid onClick={() => this.addNew('special')}>Add....</Button>
                     </Tab.Pane> },
             { menuItem: 'Servers', render: () =>
                     <Tab.Pane>
@@ -214,12 +219,52 @@ class WebRTC extends Component {
                                 {servers_options}
                             </Table.Body>
                         </Table>
-                        <Button size="mini" fluid>Add....</Button>
+                        <Button size="mini" fluid onClick={() => this.addNew('servers')}>Add....</Button>
                     </Tab.Pane> },
         ]
 
         return (
-            <Tab panes={panes} />
+            <Fragment>
+                <Tab panes={panes} >
+
+                </Tab>
+            <Modal
+                open={open}
+                onClose={() => this.setState({open: false})}
+                size='small'
+                closeIcon
+            >
+                <Header content='Room Details'/>
+                <Modal.Content>
+                    <Form>
+                        <Form.Field required>
+                            <label>Name</label>
+                            <Input
+                                value="test"
+                                onChange={this.change}
+                                placeholder='Room name goes here'
+                            />
+                            <small> Up to 64 characters. </small>
+                        </Form.Field>
+                        {/*<Form.Select*/}
+                        {/*    label='Gateway'*/}
+                        {/*    options={}*/}
+                        {/*    value={}*/}
+                        {/*    onChange={}*/}
+                        {/*    required*/}
+                        {/*/>*/}
+                    </Form>
+                </Modal.Content>
+                <Modal.Actions>
+                    <Button onClick={() => this.closeModal('createEditRoom')}>
+                        <Icon name='cancel'/> Cancel
+                    </Button>
+                    <Button primary onClick={this.doSaveRoom}>
+                        <Icon name='save outline'/> Save
+                    </Button>
+                </Modal.Actions>
+            </Modal>
+            </Fragment>
         );
     }
 }
