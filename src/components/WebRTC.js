@@ -58,6 +58,7 @@ class WebRTC extends Component {
         console.log(":: Save item: ", conf);
         putData(`webrtc/${source}/${conf.language}`, conf, (data) => {
             console.log("saveProp callback: ", data);
+            this.setState({open: false, conf: {}});
             this.getConf();
         });
     };
@@ -67,6 +68,7 @@ class WebRTC extends Component {
         console.log(":: Del item: ", conf);
         removeData(`webrtc/${source}/${conf.language}`, (data) => {
             console.log("removeProp callback: ", data);
+            this.setState({open: false, conf: {}});
             this.getConf();
         });
     };
