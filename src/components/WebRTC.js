@@ -1,6 +1,6 @@
 import React, {Component, Fragment} from 'react'
-import {Tab, Table, Icon, Button, Modal, Header, Form, Message, Input, Menu, List} from 'semantic-ui-react'
-import {getData} from "../shared/tools";
+import {Tab, Table, Icon, Button, Modal, Header, Input, Menu} from 'semantic-ui-react'
+import {getData, putData, removeData} from "../shared/tools";
 
 
 class WebRTC extends Component {
@@ -19,6 +19,10 @@ class WebRTC extends Component {
     };
 
     componentDidMount() {
+        this.getConf();
+    };
+
+    getConf = () => {
         getData(`webrtc`, (webrtc) => {
             console.log(":: Got webrtc : ",webrtc);
             const {sadna,sound,trlout,video,special,servers} = webrtc;
@@ -29,9 +33,9 @@ class WebRTC extends Component {
     addNew = (source, new_prop) => {
         let conf
         if(source === "video") {
-            conf = {title: "", proxy_port: "", janus_port: "", janus_id: ""}
+            conf = {language: "", title: "", proxy_port: "", janus_port: "", janus_id: ""}
         } else if(source === "servers") {
-            conf = {title: "", dns: "", ip: "", enabled: true}
+            conf = {language: "", title: "", dns: "", ip: "", enabled: true}
         } else {
             conf = {language: "", proxy_port: "", janus_port: "", janus_id: "", ffmpeg_channel: ""}
         }
@@ -47,12 +51,30 @@ class WebRTC extends Component {
         const {conf} = this.state;
         conf[key] = value;
         this.setState({conf})
-    }
+    };
+
+    saveProp = () => {
+        const {source,conf} = this.state;
+        console.log(":: Save item: ", conf);
+        putData(`webrtc/${source}/${conf.language}`, conf, (data) => {
+            console.log("saveProp callback: ", data);
+            this.getConf();
+        });
+    };
+
+    removeProp = () => {
+        const {source,conf} = this.state;
+        console.log(":: Del item: ", conf);
+        removeData(`webrtc/${source}/${conf.language}`, (data) => {
+            console.log("removeProp callback: ", data);
+            this.getConf();
+        });
+    };
 
     renderContent = () => {
         const {source,conf} = this.state;
         if(source === "video") {
-            let {title, proxy_port, janus_port, janus_id} = conf;
+            let {language, proxy_port, janus_port, janus_id} = conf;
             return (
                 <Table compact='very' basic size='small'>
                     <Table.Header>
@@ -66,7 +88,7 @@ class WebRTC extends Component {
 
                     <Table.Body>
                         <Table.Row className="monitor_tr">
-                            <Table.Cell><Input size='mini' value={title} onChange={(e) => this.setValue("title", e.target.value)} /></Table.Cell>
+                            <Table.Cell><Input size='mini' value={language} onChange={(e) => this.setValue("language", e.target.value)} /></Table.Cell>
                             <Table.Cell><Input size='mini' type="number" value={proxy_port} onChange={(e) => this.setValue("proxy_port", Number(e.target.value))} /></Table.Cell>
                             <Table.Cell><Input size='mini' type="number" value={janus_port} onChange={(e) => this.setValue("janus_port", Number(e.target.value))} /></Table.Cell>
                             <Table.Cell><Input size='mini' type="number" value={janus_id} onChange={(e) => this.setValue("janus_id", Number(e.target.value))} /></Table.Cell>
@@ -75,11 +97,12 @@ class WebRTC extends Component {
                 </Table>
             )
         } else if(source === "servers") {
-            let {title, dns, ip} = conf;
+            let {language, title, dns, ip} = conf;
             return (
                 <Table compact='very' basic size='small'>
                     <Table.Header>
                         <Table.Row className='table_header'>
+                            <Table.HeaderCell width={1}>ID</Table.HeaderCell>
                             <Table.HeaderCell width={1}>Title</Table.HeaderCell>
                             <Table.HeaderCell width={1}>DNS</Table.HeaderCell>
                             <Table.HeaderCell width={1}>IP</Table.HeaderCell>
@@ -89,6 +112,7 @@ class WebRTC extends Component {
 
                     <Table.Body>
                         <Table.Row className="monitor_tr">
+                            <Table.Cell><Input size='mini' value={language} onChange={(e) => this.setValue("language", e.target.value)} /></Table.Cell>
                             <Table.Cell><Input size='mini' value={title} onChange={(e) => this.setValue("title", e.target.value)} /></Table.Cell>
                             <Table.Cell><Input size='mini' value={dns} onChange={(e) => this.setValue("dns", e.target.value)} /></Table.Cell>
                             <Table.Cell><Input size='mini' value={ip} onChange={(e) => this.setValue("ip", e.target.value)} /></Table.Cell>
@@ -198,6 +222,7 @@ class WebRTC extends Component {
             let conf = servers[id];
             return (
                 <Table.Row key={i} className="monitor_tr" onClick={() => this.editProp('servers', false, conf)}>
+                    <Table.Cell>{conf.language}</Table.Cell>
                     <Table.Cell>{conf.title}</Table.Cell>
                     <Table.Cell>{conf.dns}</Table.Cell>
                     <Table.Cell>{conf.ip}</Table.Cell>
@@ -306,6 +331,7 @@ class WebRTC extends Component {
                         <Table compact='very' basic size='small'>
                             <Table.Header>
                                 <Table.Row className='table_header'>
+                                    <Table.HeaderCell width={1}>ID</Table.HeaderCell>
                                     <Table.HeaderCell width={1}>Title</Table.HeaderCell>
                                     <Table.HeaderCell width={1}>DNS</Table.HeaderCell>
                                     <Table.HeaderCell width={1}>IP</Table.HeaderCell>
@@ -343,7 +369,7 @@ class WebRTC extends Component {
                         </Menu.Item>
                         <Menu.Item position='right'>
                             {new_prop ? "" :
-                                <Button negative onClick={() => this.removeProp}>
+                                <Button negative onClick={this.removeProp}>
                                     <Icon name='cancel'/> Remove
                                 </Button>
                             }
