@@ -40,8 +40,14 @@ class WebRTC extends Component {
 
     editProp = (source, new_prop, conf) => {
         console.log("Edit: ", conf)
-        this.setState({open: true, source, new_prop, conf})
+        this.setState({open: true, source, new_prop, conf});
     };
+
+    setValue = (key, value) => {
+        const {conf} = this.state;
+        conf[key] = value;
+        this.setState({conf})
+    }
 
     renderContent = () => {
         const {source,conf} = this.state;
@@ -60,10 +66,10 @@ class WebRTC extends Component {
 
                     <Table.Body>
                         <Table.Row className="monitor_tr">
-                            <Table.Cell><Input size='mini' value={title} /></Table.Cell>
-                            <Table.Cell><Input size='mini' value={proxy_port} /></Table.Cell>
-                            <Table.Cell><Input size='mini' value={janus_port} /></Table.Cell>
-                            <Table.Cell><Input size='mini' value={janus_id} /></Table.Cell>
+                            <Table.Cell><Input size='mini' value={title} onChange={(e) => this.setValue("title", e.target.value)} /></Table.Cell>
+                            <Table.Cell><Input size='mini' type="number" value={proxy_port} onChange={(e) => this.setValue("proxy_port", Number(e.target.value))} /></Table.Cell>
+                            <Table.Cell><Input size='mini' type="number" value={janus_port} onChange={(e) => this.setValue("janus_port", Number(e.target.value))} /></Table.Cell>
+                            <Table.Cell><Input size='mini' type="number" value={janus_id} onChange={(e) => this.setValue("janus_id", Number(e.target.value))} /></Table.Cell>
                         </Table.Row>
                     </Table.Body>
                 </Table>
@@ -83,9 +89,9 @@ class WebRTC extends Component {
 
                     <Table.Body>
                         <Table.Row className="monitor_tr">
-                            <Table.Cell><Input size='mini' value={title} /></Table.Cell>
-                            <Table.Cell><Input size='mini' value={dns} /></Table.Cell>
-                            <Table.Cell><Input size='mini' value={ip} /></Table.Cell>
+                            <Table.Cell><Input size='mini' value={title} onChange={(e) => this.setValue("title", e.target.value)} /></Table.Cell>
+                            <Table.Cell><Input size='mini' value={dns} onChange={(e) => this.setValue("dns", e.target.value)} /></Table.Cell>
+                            <Table.Cell><Input size='mini' value={ip} onChange={(e) => this.setValue("ip", e.target.value)} /></Table.Cell>
                             <Table.Cell><Input size='mini' /></Table.Cell>
                         </Table.Row>
                     </Table.Body>
@@ -107,11 +113,11 @@ class WebRTC extends Component {
 
                     <Table.Body>
                         <Table.Row className="monitor_tr">
-                            <Table.Cell><Input size='mini' value={language} /></Table.Cell>
-                            <Table.Cell><Input size='mini' value={proxy_port} /></Table.Cell>
-                            <Table.Cell><Input size='mini' value={janus_port} /></Table.Cell>
-                            <Table.Cell><Input size='mini' value={janus_id} /></Table.Cell>
-                            <Table.Cell><Input size='mini' value={ffmpeg_channel} /></Table.Cell>
+                            <Table.Cell><Input size='mini' value={language} onChange={(e) => this.setValue("language", e.target.value)} /></Table.Cell>
+                            <Table.Cell><Input size='mini' type="number" value={proxy_port} onChange={(e) => this.setValue("proxy_port", Number(e.target.value))} /></Table.Cell>
+                            <Table.Cell><Input size='mini' type="number" value={janus_port} onChange={(e) => this.setValue("janus_port", Number(e.target.value))} /></Table.Cell>
+                            <Table.Cell><Input size='mini' type="number" value={janus_id} onChange={(e) => this.setValue("janus_id", Number(e.target.value))} /></Table.Cell>
+                            <Table.Cell><Input size='mini' type="number" value={ffmpeg_channel + 1} onChange={(e) => this.setValue("ffmpeg_channel", (Number(e.target.value) - 1))} /></Table.Cell>
                         </Table.Row>
                     </Table.Body>
                 </Table>
