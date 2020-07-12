@@ -1,15 +1,9 @@
 import React, {Component} from 'react'
-import moment from 'moment';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
+//import moment from 'moment';
+//import DatePicker from 'react-datepicker';
+//import 'react-datepicker/dist/react-datepicker.css';
 import {Divider, Table, Segment, Label, Dropdown, Select, Message, Button, Icon} from 'semantic-ui-react'
-import {
-    getWorkflowData,
-    langch_options,
-    streamFetcher,
-    vres_options,
-    WFSRV_BACKEND
-} from "../shared/tools";
+import {getWorkflowData, langch_options, streamFetcher, vres_options} from "../shared/tools";
 
 
 class Playouts extends Component {
@@ -19,8 +13,8 @@ class Playouts extends Component {
         main: [],
         backup: [],
         trimmed: [],
-        date: moment().format('YYYY-MM'),
-        startDate: moment(),
+        //date: moment().format('YYYY-MM'),
+        //startDate: moment(),
         files: [],
         file_data: "",
         file_name: "",

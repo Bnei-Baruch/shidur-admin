@@ -225,7 +225,7 @@ class WebRTC extends Component {
 
         return (
             <Fragment>
-                <Tab panes={panes} >
+                <Tab panes={panes} className='webrtc'>
 
                 </Tab>
             <Modal

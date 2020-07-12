@@ -115,7 +115,7 @@
     font-weight: bolder;
 }
 
-.ui.table tr:hover {
+.webrtc .ui.table tr:hover {
     background: #e1e6d4!important;
 }
 
