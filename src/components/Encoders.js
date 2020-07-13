@@ -109,7 +109,7 @@ class Encoders extends Component {
                     </Dropdown>
                 </Label>
                 <Divider />
-                <Table basic='very' compact='very' collapsing>
+                <Table basic='very'>
                     <Table.Header>
                         <Table.Row>
                             <Table.HeaderCell></Table.HeaderCell>
