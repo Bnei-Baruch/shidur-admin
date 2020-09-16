@@ -97,6 +97,10 @@ class App extends Component {
                             id={playout_id}
                             playouts={playouts} />
               </Tab.Pane> },
+          { menuItem: { key: 'webrtc', icon: 'globe', content: 'WebRTC' },
+              render: () => <Tab.Pane attached={false} >
+                  <WebRTC />
+              </Tab.Pane> },
           { menuItem: { key: 'settings', icon: 'settings', content: 'Settings' },
               render: () => <Tab.Pane attached={false} >
                   <Settings getState={this.getState}
@@ -105,10 +109,6 @@ class App extends Component {
                             captures={captures}
                             playouts={playouts}
                             workflows={workflows}/>
-              </Tab.Pane> },
-          { menuItem: { key: 'webrtc', icon: 'globe', content: 'WebRTC' },
-              render: () => <Tab.Pane attached={false} >
-                  <WebRTC />
               </Tab.Pane> },
       ];
 

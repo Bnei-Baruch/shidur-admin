@@ -1,6 +1,6 @@
 import React, {Component, Fragment} from 'react'
-import {Tab, Table, Icon, Button, Modal, Header, Input, Menu} from 'semantic-ui-react'
-import {getData, putData, removeData} from "../shared/tools";
+import {Tab, Table, Icon, Button, Modal, Header, Input, Menu, Message} from 'semantic-ui-react'
+import {getData, proxyFetcher, putData, removeData} from "../shared/tools";
 
 
 class WebRTC extends Component {
@@ -16,9 +16,11 @@ class WebRTC extends Component {
         open: false,
         source: "",
         new_prop: false,
+        status: "Off"
     };
 
     componentDidMount() {
+        this.statusProxy();
         this.getConf();
     };
 
@@ -70,6 +72,31 @@ class WebRTC extends Component {
             console.log("removeProp callback: ", data);
             this.setState({open: false, conf: {}});
             this.getConf();
+        });
+    };
+
+    statusProxy = () => {
+        const req = {id: "status", req: "udp"};
+        proxyFetcher(req,  (data) => {
+            let status = data.stdout.replace(/\n/ig, '');
+            console.log(":: Start Proxy status: ", status);
+            this.setState({status});
+        });
+    }
+
+    startProxy = () => {
+        this.setState({status: "On"});
+        const req = {id: "start", req: "udp"};
+        proxyFetcher(req,  (data) => {
+            console.log(":: Start Proxy: ", data);
+        });
+    };
+
+    stopProxy = () => {
+        this.setState({status: "Off"});
+        const req = {id: "stop", req: "udp"};
+        proxyFetcher(req,  (data) => {
+            console.log(":: Stop Proxy: ", data);
         });
     };
 
@@ -152,7 +179,7 @@ class WebRTC extends Component {
     };
 
     render() {
-        const {sadna,sound,trlout,video,special,servers,open,source,new_prop} = this.state;
+        const {sadna,sound,trlout,video,special,servers,open,source,new_prop,status} = this.state;
         const v = (<Icon color='green' name='checkmark' />);
         const x = (<Icon color='red' name='close' />);
 
@@ -379,6 +406,16 @@ class WebRTC extends Component {
                     </Menu>
                 </Modal.Actions>
             </Modal>
+
+                <Message className='or_buttons' >
+                    <Button.Group >
+                        <Button positive disabled={status !== "Off"}
+                                onClick={this.startProxy}>Start</Button>
+                        <Button.Or text='udp' />
+                        <Button negative disabled={status !== "On"}
+                                onClick={this.stopProxy}>Stop</Button>
+                    </Button.Group>
+                </Message>
             </Fragment>
         );
     }
