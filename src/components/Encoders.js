@@ -1,5 +1,17 @@
 import React, {Component} from 'react'
-import {Divider, Table, Segment, Label, Dropdown, Select, Message, Button, List, Menu} from 'semantic-ui-react'
+import {
+    Divider,
+    Table,
+    Segment,
+    Label,
+    Dropdown,
+    Select,
+    Message,
+    Button,
+    List,
+    Menu,
+    Checkbox
+} from 'semantic-ui-react'
 import {channels_options, vres_options, vrate_options, arate_options, protocol_options, encstr_options, dest_options, encrec_options, streamFetcher} from "../shared/tools";
 
 
@@ -109,93 +121,33 @@ class Encoders extends Component {
                     </Dropdown>
                 </Label>
                 <Divider />
-                <Table basic='very'>
-                    <Table.Header>
-                        <Table.Row>
-                            <Table.HeaderCell></Table.HeaderCell>
-                            <Table.HeaderCell />
-                            <Table.HeaderCell></Table.HeaderCell>
-                            <Table.HeaderCell />
-                            <Table.HeaderCell></Table.HeaderCell>
-                            <Table.HeaderCell />
-                        </Table.Row>
-                    </Table.Header>
 
-                    <Table.Body>
-                        <Table.Row>
-                            <Table.Cell>Bitrate</Table.Cell>
-                            <Table.Cell>
-                                <Select disabled={!id}
-                                        compact options={vrate_options}
-                                        value={id ? encoders[id].jsonst.vrate : ""}
-                                        onChange={(e, {value}) => this.setJsonState("vrate", value)}
-                                />
-                            </Table.Cell>
-                            <Table.Cell>Bitrate</Table.Cell>
-                            <Table.Cell>
-                                <Select disabled={!id}
-                                        compact options={arate_options}
-                                        value={id ? encoders[id].jsonst.arate : ""}
-                                        onChange={(e, {value}) => this.setJsonState("arate", value)}
-                                />
-                            </Table.Cell>
-                            <Table.Cell>Protocol</Table.Cell>
-                            <Table.Cell>
-                                <Select disabled={!id}
-                                        compact options={protocol_options}
-                                        value={id ? encoders[id].jsonst.protocol : ""}
-                                        onChange={(e, {value}) => this.setJsonState("protocol", value)}
-                                />
-                            </Table.Cell>
-                        </Table.Row>
-                        <Table.Row>
-                            <Table.Cell>Size</Table.Cell>
-                            <Table.Cell>
-                                <Select disabled={!id}
-                                        compact options={vres_options}
-                                        value={id ? encoders[id].jsonst.vres : ""}
-                                        onChange={(e, {value}) => this.setJsonState("vres", value)}
-                                />
-                            </Table.Cell>
-                            <Table.Cell>Channels</Table.Cell>
-                            <Table.Cell>
-                                <Select disabled={!id}
-                                        compact options={channels_options}
-                                        value={id ? encoders[id].jsonst.channels : ""}
-                                        onChange={(e, {value}) => this.setJsonState("channels", value)}
-                                />
-                            </Table.Cell>
-                            <Table.Cell>Software</Table.Cell>
-                            <Table.Cell>
-                                <Select disabled={!id}
-                                        compact options={encstr_options}
-                                        value={id ? encoders[id].jsonst.encstr : ""}
-                                        onChange={(e, {value}) => this.setJsonState("encstr", value)}
-                                />
-                            </Table.Cell>
-                        </Table.Row>
-                    </Table.Body>
-                    <Table.Footer>
-                        <Table.Row>
-                            <Table.HeaderCell><b>Target</b></Table.HeaderCell>
-                            <Table.HeaderCell colSpan='2'>
-                                <Select disabled={!id}
-                                        compact options={dest_options}
-                                        value={id ? encoders[id].jsonst.dest : ""}
-                                        onChange={(e, {value}) => this.setJsonState("dest", value)}
-                                />
-                            </Table.HeaderCell>
-                            <Table.HeaderCell><b>Record</b></Table.HeaderCell>
-                            <Table.HeaderCell>
-                                <Select disabled={!id}
-                                        compact options={encrec_options}
-                                        value={id ? encoders[id].jsonst.encrec : ""}
-                                        onChange={(e, {value}) => this.setJsonState("encrec", value)}
-                                />
-                            </Table.HeaderCell>
-                        </Table.Row>
-                    </Table.Footer>
-                </Table>
+                {id === "dante-main" || id === "dante-backup" ?
+                    <Table basic='very'>
+                        <Table.Header>
+                            <Table.Row>
+                                <Table.HeaderCell></Table.HeaderCell>
+                                <Table.HeaderCell />
+                                <Table.HeaderCell></Table.HeaderCell>
+                                <Table.HeaderCell />
+                            </Table.Row>
+                        </Table.Header>
+
+                        <Table.Body>
+                            <Table.Row>
+                                <Table.Cell><b>Dante Mode</b></Table.Cell>
+                                <Table.Cell>IN :</Table.Cell>
+                                <Table.Cell>
+                                    <Checkbox onClick={() => this.setJsonState("in", !encoders[id].jsonst.in)} checked={encoders[id].jsonst.in} />
+                                </Table.Cell>
+                                <Table.Cell>OUT :</Table.Cell>
+                                <Table.Cell>
+                                    <Checkbox onClick={() => this.setJsonState("out", !encoders[id].jsonst.out)} checked={encoders[id].jsonst.out} />
+                                </Table.Cell>
+                            </Table.Row>
+                        </Table.Body>
+                    </Table>
+                : null}
                 <Message className='or_buttons' >
                     <Menu fluid secondary text>
                         <Menu.Item>
