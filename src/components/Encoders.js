@@ -136,53 +136,63 @@ class Encoders extends Component {
                         <Table.Body>
                             <Table.Row>
                                 <Table.Cell><b>Dante Mode</b></Table.Cell>
-                                <Table.Cell>IN :</Table.Cell>
                                 <Table.Cell>
-                                    <Checkbox onClick={() => this.setJsonState("in", !encoders[id].jsonst.in)} checked={encoders[id].jsonst.in} />
+                                    <Segment compact>
+                                    <Checkbox label='IN' toggle disabled={status === "On"}
+                                              onChange={() => this.setJsonState("in", !encoders[id].jsonst.in)} checked={encoders[id].jsonst.in} />
+                                    </Segment>
                                 </Table.Cell>
-                                <Table.Cell>OUT :</Table.Cell>
                                 <Table.Cell>
-                                    <Checkbox onClick={() => this.setJsonState("out", !encoders[id].jsonst.out)} checked={encoders[id].jsonst.out} />
+                                    <Segment compact>
+                                    <Checkbox label='OUT' toggle disabled={status === "On"}
+                                              onChange={() => this.setJsonState("out", !encoders[id].jsonst.out)} checked={encoders[id].jsonst.out} />
+                                    </Segment>
                                 </Table.Cell>
                             </Table.Row>
                         </Table.Body>
                     </Table>
                 : null}
-                <Message className='or_buttons' >
-                    <Menu fluid secondary text>
-                        <Menu.Item>
-                            <Button.Group >
-                                <Button positive disabled={status !== "Off"}
-                                        onClick={this.startEncoder}>Start</Button>
-                                <Button.Or text='enc' />
-                                <Button negative disabled={status !== "On"}
-                                        onClick={this.stopEncoder}>Stop</Button>
-                            </Button.Group>
-                        </Menu.Item>
-                        <Menu.Item position='right'>
-                            <List className='stat' size='small'>
-                                <List.Item>
-                                    <List.Icon name='microchip' />
-                                    <List.Content
-                                        className={parseInt(stat.cpu) > 90 ? "warning" : ""}>
-                                        CPU: <b>{stat.cpu}</b></List.Content>
-                                </List.Item>
-                                <List.Item>
-                                    <List.Icon name='server' />
-                                    <List.Content
-                                        className={parseInt(stat.hdd) > 90 ? "warning" : ""}>
-                                        HDD: <b>{stat.hdd}</b></List.Content>
-                                </List.Item>
-                                <List.Item>
-                                    <List.Icon name='thermometer' />
-                                    <List.Content
-                                        className={parseInt(stat.temp) > 80 ? "warning" : ""}>
-                                        TMP: <b>{stat.temp}</b></List.Content>
-                                </List.Item>
-                            </List>
-                        </Menu.Item>
-                    </Menu>
-                </Message>
+
+                {!id ? null :
+                    <Message className='or_buttons'>
+                        <Menu fluid secondary text>
+                            <Menu.Item>
+                                <Button.Group>
+                                    <Button positive disabled={status !== "Off"}
+                                            onClick={this.startEncoder}>Start</Button>
+                                    <Button.Or text='enc'/>
+                                    <Button negative disabled={status !== "On"}
+                                            onClick={this.stopEncoder}>Stop</Button>
+                                </Button.Group>
+                            </Menu.Item>
+
+                            {id === "dante-main" || id === "dante-backup" || id === "mac-live-main" || id === "mac-live-backup" ? null :
+                                <Menu.Item position='right'>
+                                    <List className='stat' size='small'>
+                                        <List.Item>
+                                            <List.Icon name='microchip'/>
+                                            <List.Content
+                                                className={parseInt(stat.cpu) > 90 ? "warning" : ""}>
+                                                CPU: <b>{stat.cpu}</b></List.Content>
+                                        </List.Item>
+                                        <List.Item>
+                                            <List.Icon name='server'/>
+                                            <List.Content
+                                                className={parseInt(stat.hdd) > 90 ? "warning" : ""}>
+                                                HDD: <b>{stat.hdd}</b></List.Content>
+                                        </List.Item>
+                                        <List.Item>
+                                            <List.Icon name='thermometer'/>
+                                            <List.Content
+                                                className={parseInt(stat.temp) > 80 ? "warning" : ""}>
+                                                TMP: <b>{stat.temp}</b></List.Content>
+                                        </List.Item>
+                                    </List>
+                                </Menu.Item>
+                            }
+                        </Menu>
+                    </Message>
+                }
             </Segment>
         );
     }
