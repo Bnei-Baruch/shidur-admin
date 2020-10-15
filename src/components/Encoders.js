@@ -38,7 +38,8 @@ class Encoders extends Component {
     setEncoder = (id, encoder) => {
         console.log(":: Set encoder: ",encoder);
         this.setState({id, encoder});
-        let req = {"req":"strstat", "id":"status"};
+        let value = id.match(/^mac-trl/) ? "trlstat" : "strstat";
+        let req = {"req": value, "id": "status"};
         streamFetcher(encoder.ip, `encoder`, req,  (data) => {
             let status = data.stdout.replace(/\n/ig, '');
             console.log(":: Got Encoder status: ",status);
@@ -57,9 +58,10 @@ class Encoders extends Component {
 
     startEncoder = () => {
         this.setState({status: "On"});
-        let {encoder} = this.state;
+        let {encoder, id} = this.state;
         let {jsonst} = encoder;
-        jsonst.id = "stream";
+        let value = id.match(/^mac-trl/) ? "trlout" : "stream";
+        jsonst.id = value;
         jsonst.req = "start";
         streamFetcher(encoder.ip, `encoder`, jsonst,  (data) => {
             console.log(":: Start Encoder status: ",data);
@@ -69,9 +71,10 @@ class Encoders extends Component {
 
     stopEncoder = () => {
         this.setState({status: "Off"});
-        let {encoder} = this.state;
+        let {encoder, id} = this.state;
         let {jsonst} = encoder;
-        jsonst.id = "stream";
+        let value = id.match(/^mac-trl/) ? "trlout" : "stream";
+        jsonst.id = value;
         jsonst.req = "stop";
         streamFetcher(encoder.ip, `encoder`, jsonst,  (data) => {
             console.log(":: Stop Encoder status: ",data);
@@ -89,7 +92,8 @@ class Encoders extends Component {
     };
 
     getStat = () => {
-        const {encoder} = this.state;
+        const {encoder, id} = this.state;
+        if(id.match(/^mac-/)) return;
         let req = {"req": "encstat", "id": "stream"};
         streamFetcher(encoder.ip, `encoder`, req, (data) => {
             let stat = data.jsonst ? data.jsonst : {cpu: "", hdd: "", temp: ""};
@@ -166,7 +170,7 @@ class Encoders extends Component {
                                 </Button.Group>
                             </Menu.Item>
 
-                            {id === "dante-main" || id === "dante-backup" || id === "mac-live-main" || id === "mac-live-backup" ? null :
+                            {id.match(/^mac-/) ? null :
                                 <Menu.Item position='right'>
                                     <List className='stat' size='small'>
                                         <List.Item>
