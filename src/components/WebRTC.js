@@ -1,5 +1,5 @@
 import React, {Component, Fragment} from 'react'
-import {Tab, Table, Icon, Button, Modal, Header, Input, Menu, Message} from 'semantic-ui-react'
+import {Tab, Table, Icon, Button, Modal, Header, Input, Menu, Message, Checkbox} from 'semantic-ui-react'
 import {getData, proxyFetcher, putData, removeData} from "../shared/tools";
 
 
@@ -37,7 +37,7 @@ class WebRTC extends Component {
         if(source === "video") {
             conf = {language: "", title: "", proxy_port: "", janus_port: "", janus_id: ""}
         } else if(source === "servers") {
-            conf = {language: "", title: "", dns: "", ip: "", enabled: true}
+            conf = {role: "", title: "", dns: "", ip: "", enabled: true}
         } else {
             conf = {language: "", proxy_port: "", janus_port: "", janus_id: "", ffmpeg_channel: ""}
         }
@@ -126,7 +126,7 @@ class WebRTC extends Component {
                 </Table>
             )
         } else if(source === "servers") {
-            let {language, title, dns, ip} = conf;
+            let {language, role, title, dns, ip, enabled} = conf;
             return (
                 <Table compact='very' basic size='small'>
                     <Table.Header>
@@ -135,6 +135,7 @@ class WebRTC extends Component {
                             <Table.HeaderCell width={1}>Title</Table.HeaderCell>
                             <Table.HeaderCell width={1}>DNS</Table.HeaderCell>
                             <Table.HeaderCell width={1}>IP</Table.HeaderCell>
+                            <Table.HeaderCell width={1}>Role</Table.HeaderCell>
                             <Table.HeaderCell width={1}>Enabled</Table.HeaderCell>
                         </Table.Row>
                     </Table.Header>
@@ -145,7 +146,8 @@ class WebRTC extends Component {
                             <Table.Cell><Input size='mini' value={title} onChange={(e) => this.setValue("title", e.target.value)} /></Table.Cell>
                             <Table.Cell><Input size='mini' value={dns} onChange={(e) => this.setValue("dns", e.target.value)} /></Table.Cell>
                             <Table.Cell><Input size='mini' value={ip} onChange={(e) => this.setValue("ip", e.target.value)} /></Table.Cell>
-                            <Table.Cell><Input size='mini' /></Table.Cell>
+                            <Table.Cell><Input size='mini' value={role} onChange={(e) => this.setValue("role", e.target.value)} /></Table.Cell>
+                            <Table.Cell><Checkbox onClick={() => this.setValue("enabled", !enabled)} checked={enabled} /></Table.Cell>
                         </Table.Row>
                     </Table.Body>
                 </Table>
@@ -255,6 +257,7 @@ class WebRTC extends Component {
                     <Table.Cell>{conf.title}</Table.Cell>
                     <Table.Cell>{conf.dns}</Table.Cell>
                     <Table.Cell>{conf.ip}</Table.Cell>
+                    <Table.Cell>{conf.role}</Table.Cell>
                     <Table.Cell>{conf.enabled ? v : x}</Table.Cell>
                 </Table.Row>
             )
@@ -364,6 +367,7 @@ class WebRTC extends Component {
                                     <Table.HeaderCell width={1}>Title</Table.HeaderCell>
                                     <Table.HeaderCell width={1}>DNS</Table.HeaderCell>
                                     <Table.HeaderCell width={1}>IP</Table.HeaderCell>
+                                    <Table.HeaderCell width={1}>Role</Table.HeaderCell>
                                     <Table.HeaderCell width={1}>Enabled</Table.HeaderCell>
                                 </Table.Row>
                             </Table.Header>

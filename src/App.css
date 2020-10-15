@@ -139,3 +139,7 @@
 .ui.table thead th {
     padding: .2em .3em;
 }
+
+.monitor_tr .ui.input {
+    width: 110px;
+}
