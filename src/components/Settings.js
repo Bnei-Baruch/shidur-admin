@@ -1,156 +1,159 @@
-import React, {Component} from 'react'
-import { Divider, Table, Segment, Label, Dropdown, Input, Button } from 'semantic-ui-react'
+import React, {Component, Fragment} from 'react'
+import {Table, Input, Button, Tab, Modal, Header, Menu, Icon} from 'semantic-ui-react'
 import {getData, putData, removeData} from "../shared/tools";
 
 
 class Settings extends Component {
 
     state = {
+        conf: "",
         name: "",
         ip: "",
         id: "",
-        status: null,
-        streamer: {}
+        open: false,
+        props: "",
+        new_prop: false,
+        streamer: {},
     };
 
     componentDidMount() {
+        this.getConf();
+    };
+
+    getConf = () => {
         getData(`streamer`, (streamer) => {
-            console.log(":: Got streamer: ",streamer);
+            console.log(":: Got streamer : ",streamer);
             this.setState({streamer});
         });
     };
 
-    newStreamerItem = () => {
-        let {id,streamer,name,ip} = this.state;
-        let itemid = id.toLowerCase();
-        let prop = name.toLowerCase();
-        streamer[itemid][prop] = {name, ip , jsonst: {}};
-        console.log(streamer);
-        this.setState({streamer, name: "", ip: ""});
-        putData(`streamer/${itemid}/${prop}`, {name, ip , jsonst: {}}, (data) => {
-            console.log("newStreamerItem callback: ", data);
-            this.props.getState();
+    addNew = (source, new_prop) => {
+        let props = {name: "", ip: "", description: "", jsonst: {}};
+        this.setState({open: true, source, new_prop, props});
+    };
+
+    editProp = (props, new_prop, conf, id) => {
+        console.log("Edit: ", props);
+        this.setState({open: true, props, new_prop, conf, id});
+    };
+
+    setValue = (key, value) => {
+        const {props} = this.state;
+        props[key] = value;
+        this.setState({props});
+    };
+
+    saveProp = () => {
+        const {id, conf, props} = this.state;
+        console.log(":: Save item: ", conf);
+        putData(`streamer/${conf}/${id}`, props, (data) => {
+            console.log("saveProp callback: ", data);
+            this.setState({open: false, conf: "", id: "", props: ""});
+            this.getConf();
         });
     };
 
-    setStreamerItem = (id) => {
-        console.log(":: Set streamer item: ",id);
-        this.setState({id});
-    };
-
-    saveStreamer = () => {
-        let {streamer,itemid,item} = this.state;
-        let json = streamer[itemid][item];
-        putData(`streamer/${itemid}/${item}`, json, (data) => {
-            console.log("saveStreamerItem callback: ", data);
-            this.props.getState();
+    removeProp = () => {
+        const {id, conf} = this.state;
+        console.log(":: Del item: ", conf);
+        removeData(`streamer/${conf}/${id}`, (data) => {
+            console.log("removeProp callback: ", data);
+            this.setState({open: false, conf: "", id: "", props: ""});
+            this.getConf();
         });
     };
 
-    delStreamerItem = (name) => {
-        let {id,streamer} = this.state;
-        let itemid = id.toLowerCase();
-        let prop = name.toLowerCase();
-        delete streamer[itemid][prop];
-        console.log(":: Del streamer item: ",name);
-        this.setState({streamer});
-        removeData(`streamer/${itemid}/${prop}`, (data) => {
-            console.log("delStreamerItem callback: ", data);
-            this.props.getState();
-        });
-    };
+    renderContent = () => {
+        const {props} = this.state;
+        let {name, ip, description} = props;
+        return (
+            <Table compact='very' basic>
+                <Table.Header>
+                    <Table.Row className='table_header'>
+                        <Table.HeaderCell width={1}>Name</Table.HeaderCell>
+                        <Table.HeaderCell width={1}>IP</Table.HeaderCell>
+                        <Table.HeaderCell width={1}>Description</Table.HeaderCell>
+                    </Table.Row>
+                </Table.Header>
 
-    setValue = (item, value, prop) => {
-        let {id,streamer} = this.state;
-        let itemid = id.toLowerCase();
-        //console.log(":: Set streamer id: " + itemid + " item: " + item + " value: " + value);
-        streamer[itemid][item][prop] = value;
-        this.setState({streamer,itemid,item});
-        //fetch(`${JSDB_STATE}/streamer/${itemid}/${item}?status=${value}`, { method: 'POST',})
+                <Table.Body>
+                    <Table.Row className="monitor_tr">
+                        <Table.Cell><Input value={name} onChange={(e) => this.setValue("name", e.target.value)} /></Table.Cell>
+                        <Table.Cell><Input value={ip} onChange={(e) => this.setValue("ip", e.target.value)} /></Table.Cell>
+                        <Table.Cell><Input value={description} onChange={(e) => this.setValue("description", e.target.value)} /></Table.Cell>
+                    </Table.Row>
+                </Table.Body>
+            </Table>
+        )
     };
 
     render() {
+        const {new_prop, source, streamer, open} = this.state;
 
-        const {name, ip, id, streamer} = this.state;
-        const item = streamer[id.toLowerCase()];
-
-        let set_options = Object.keys(item || []).map((itemid, i) => {
-            let pname = this.props[id.toLowerCase()][itemid] ? this.props[id.toLowerCase()][itemid].name : "";
-            let pip = this.props[id.toLowerCase()][itemid] ? this.props[id.toLowerCase()][itemid].ip : "";
-            let d = pname === item[itemid].name & pip === item[itemid].ip;
+        const panes = Object.keys(streamer).map(key => {
+            const conf = streamer[key];
             return (
-                <Table.Row key={i}>
-                    <Table.Cell>Name</Table.Cell>
-                    <Table.Cell>
-                        <Input disabled size='mini' value={item[itemid].name}
-                               onChange={(e) => this.setValue(itemid, e.target.value,"name")} />
-                    </Table.Cell>
-                    <Table.Cell>IP</Table.Cell>
-                    <Table.Cell>
-                        <Input size='mini' value={item[itemid].ip}
-                               onChange={(e) => this.setValue(itemid, e.target.value,"ip")} />
-                    </Table.Cell>
-                    <Table.Cell>
-                        <Button size='mini' positive disabled={d}
-                                onClick={this.saveStreamer}>Save</Button>
-                    </Table.Cell>
-                    <Table.Cell>
-                        <Button size='mini' negative
-                                onClick={() => this.delStreamerItem(item[itemid].name)}>Del</Button>
-                    </Table.Cell>
-                </Table.Row>
-            )
+                { menuItem: key[0].toUpperCase() + key.slice(1), render: () =>
+                        <Tab.Pane>
+                            <Table compact='very' basic>
+                                <Table.Header>
+                                    <Table.Row className='table_header'>
+                                        <Table.HeaderCell width={1}>Name</Table.HeaderCell>
+                                        <Table.HeaderCell width={1}>IP</Table.HeaderCell>
+                                        <Table.HeaderCell width={2}>Description</Table.HeaderCell>
+                                    </Table.Row>
+                                </Table.Header>
+
+                                <Table.Body>
+                                    {
+                                        Object.keys(conf).map((id, i) => {
+                                            let props = conf[id];
+                                            return (
+                                                <Table.Row key={i} className="monitor_tr" onClick={() => this.editProp(props, false, key, id)}>
+                                                    <Table.Cell>{props.name}</Table.Cell>
+                                                    <Table.Cell>{props.ip}</Table.Cell>
+                                                    <Table.Cell>{props.description}</Table.Cell>
+                                                </Table.Row>
+                                            )
+                                        })
+                                    }
+                                </Table.Body>
+                            </Table>
+                            <Button size="mini" fluid onClick={() => this.addNew(key, true)}>Add....</Button>
+                        </Tab.Pane> }
+            );
         });
 
         return(
-            <Segment textAlign='center' color='brown' raised>
-                <Label attached='top' size='big' >
-                    <Dropdown item text={id || "Select:"}>
-                        <Dropdown.Menu>
-                            <Dropdown.Item onClick={() => this.setStreamerItem("Encoders")}>Encoders</Dropdown.Item>
-                            <Dropdown.Item onClick={() => this.setStreamerItem("Decoders")}>Decoders</Dropdown.Item>
-                            <Dropdown.Item onClick={() => this.setStreamerItem("Captures")}>Captures</Dropdown.Item>
-                            <Dropdown.Item onClick={() => this.setStreamerItem("Playouts")}>Playouts</Dropdown.Item>
-                            <Dropdown.Item onClick={() => this.setStreamerItem("Workflows")}>Workflows</Dropdown.Item>
-                        </Dropdown.Menu>
-                    </Dropdown>
-                </Label>
-                <Divider />
-
-                <Table basic='very'>
-                    <Table.Header>
-                        <Table.Row>
-                            <Table.HeaderCell></Table.HeaderCell>
-                            <Table.HeaderCell />
-                            <Table.HeaderCell></Table.HeaderCell>
-                            <Table.HeaderCell />
-                            <Table.HeaderCell></Table.HeaderCell>
-                            <Table.HeaderCell />
-                        </Table.Row>
-                    </Table.Header>
-
-                    <Table.Body>
-                        {set_options}
-                        <Table.Row disabled={id === ""}>
-                            <Table.Cell>Name</Table.Cell>
-                            <Table.Cell>
-                                <Input size='mini' placeholder='Name...' value={name}
-                                       onChange={(e) => this.setState({name: e.target.value})}/>
-                            </Table.Cell>
-                            <Table.Cell>IP</Table.Cell>
-                            <Table.Cell>
-                                <Input size='mini' placeholder='IP...' value={ip}
-                                       onChange={(e) => this.setState({ip: e.target.value})}/>
-                            </Table.Cell>
-                            <Table.Cell>
-                                <Button size='mini' positive disabled={name === "" & ip === ""}
-                                        onClick={this.newStreamerItem}>New</Button>
-                            </Table.Cell>
-                            <Table.Cell></Table.Cell>
-                        </Table.Row>
-                    </Table.Body>
-                </Table>
-            </Segment>
+            <Fragment>
+                <Tab panes={panes} className='webrtc' />
+                <Modal
+                    open={open}
+                    onClose={() => this.setState({open: false})}
+                    size='small'
+                    closeIcon >
+                    <Header content={source}/>
+                    <Modal.Content>
+                        {this.renderContent()}
+                    </Modal.Content>
+                    <Modal.Actions>
+                        <Menu fluid secondary text>
+                            <Menu.Item>
+                                <Button positive onClick={this.saveProp}>
+                                    <Icon name='save outline'/> Save
+                                </Button>
+                            </Menu.Item>
+                            <Menu.Item position='right'>
+                                {new_prop ? "" :
+                                    <Button negative onClick={this.removeProp}>
+                                        <Icon name='cancel'/> Remove
+                                    </Button>
+                                }
+                            </Menu.Item>
+                        </Menu>
+                    </Modal.Actions>
+                </Modal>
+            </Fragment>
         );
     }
 }
