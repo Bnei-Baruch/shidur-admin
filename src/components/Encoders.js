@@ -109,10 +109,11 @@ class Encoders extends Component {
 
         let enc_options = Object.keys(encoders).map((id, i) => {
             let encoder = encoders[id];
+            const {name , description} = encoder;
             return (
                 <Dropdown.Item
                     key={i}
-                    onClick={() => this.setEncoder(id, encoder)}>{encoder.name}
+                    onClick={() => this.setEncoder(id, encoder)}>{description || name}
                 </Dropdown.Item>
             )
         });
@@ -120,7 +121,7 @@ class Encoders extends Component {
         return(
             <Segment textAlign='center' color={status === "On" ? 'green' : 'red'} raised>
                 <Label attached='top' size='big' >
-                    <Dropdown item text={id ? encoder.name: "Select:"}>
+                    <Dropdown item text={id ? encoder.description: "Select:"}>
                         <Dropdown.Menu>{enc_options}</Dropdown.Menu>
                     </Dropdown>
                 </Label>
