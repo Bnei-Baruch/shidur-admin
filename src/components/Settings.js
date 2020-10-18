@@ -27,9 +27,9 @@ class Settings extends Component {
         });
     };
 
-    addNew = (source, new_prop) => {
+    addNew = (conf, new_prop) => {
         let props = {name: "", ip: "", description: "", jsonst: {}};
-        this.setState({open: true, source, new_prop, props});
+        this.setState({open: true, new_prop, props, conf, id: ""});
     };
 
     editProp = (props, new_prop, conf, id) => {
@@ -44,8 +44,9 @@ class Settings extends Component {
     };
 
     saveProp = () => {
-        const {id, conf, props} = this.state;
+        let {id, conf, props} = this.state;
         console.log(":: Save item: ", conf);
+        id = id || props.name.toLowerCase();
         putData(`streamer/${conf}/${id}`, props, (data) => {
             console.log("saveProp callback: ", data);
             this.setState({open: false, conf: "", id: "", props: ""});
