@@ -12,7 +12,19 @@ import {
     Menu,
     Checkbox
 } from 'semantic-ui-react'
-import {channels_options, vres_options, vrate_options, arate_options, protocol_options, encstr_options, dest_options, encrec_options, streamFetcher} from "../shared/tools";
+import {
+    channels_options,
+    vres_options,
+    vrate_options,
+    arate_options,
+    protocol_options,
+    encstr_options,
+    dest_options,
+    encrec_options,
+    streamFetcher,
+    getService
+} from "../shared/tools";
+import Service from "./Service";
 
 
 class Encoders extends Component {
@@ -21,14 +33,14 @@ class Encoders extends Component {
         encoder: {},
         id: "",
         ival: null,
+        services: [],
         status: "",
         stat: {cpu: "", hdd: "", temp: ""}
     };
 
     componentDidMount() {
         const {id,encoders} = this.props;
-        if(id)
-            this.setEncoder(id, encoders[id]);
+        if(id) this.setEncoder(id, encoders[id]);
     };
 
     componentWillUnmount() {
@@ -41,9 +53,11 @@ class Encoders extends Component {
         let value = id.match(/^mac-trl/) ? "trlstat" : "strstat";
         let req = {"req": value, "id": "status"};
         streamFetcher(encoder.ip, `encoder`, req,  (data) => {
-            let status = data.stdout.replace(/\n/ig, '');
-            console.log(":: Got Encoder status: ",status);
-            this.setState({status});
+            if(data) {
+                let status = data.stdout.replace(/\n/ig, '');
+                console.log(":: Got Encoder status: ",status);
+                this.setState({status});
+            }
             this.runTimer();
         });
         if(id !== this.props.id)
@@ -87,7 +101,7 @@ class Encoders extends Component {
             clearInterval(this.state.ival);
         let ival = setInterval(() => {
             this.getStat();
-        }, 10000);
+        }, 1000);
         this.setState({ival});
     };
 
@@ -96,16 +110,23 @@ class Encoders extends Component {
         if(id.match(/^mac-/)) return;
         let req = {"req": "encstat", "id": "stream"};
         streamFetcher(encoder.ip, `encoder`, req, (data) => {
-            let stat = data.jsonst ? data.jsonst : {cpu: "", hdd: "", temp: ""};
+            let stat = data && data.jsonst ? data.jsonst : {cpu: "", hdd: "", temp: ""};
             //console.log(":: Got Encoder stat: ", stat);
             this.setState({stat});
         });
+        getService(id + "/status", (services) => {
+            for(let i=0; i<services.length; i++) {
+                services[i].out_time = services[i].log.split('time=')[1].split('.')[0];
+            }
+            console.log(services)
+            this.setState({services});
+        })
     };
 
     render() {
 
         const {encoders} = this.props;
-        const {encoder, id, status, stat} = this.state;
+        const {encoder, id, status, stat, services} = this.state;
 
         let enc_options = Object.keys(encoders).map((id, i) => {
             let encoder = encoders[id];
@@ -116,6 +137,10 @@ class Encoders extends Component {
                     onClick={() => this.setEncoder(id, encoder)}>{description || name}
                 </Dropdown.Item>
             )
+        });
+
+        let services_list = services.map((stream,i) => {
+            return (<Service key={i} index={i} service={services[i]} saveData={this.saveData} />);
         });
 
         return(
@@ -157,6 +182,8 @@ class Encoders extends Component {
                         </Table.Body>
                     </Table>
                 : null}
+
+                {services_list}
 
                 {!id ? null :
                     <Message className='or_buttons'>

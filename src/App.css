@@ -143,3 +143,7 @@
 .monitor_tr .ui.input {
     width: 110px;
 }
+
+.service {
+    padding: 0em 0em!important;
+}

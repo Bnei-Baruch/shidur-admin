@@ -12,6 +12,7 @@ export const DECODER_MAIN = process.env.REACT_APP_DECODER_MAIN;
 export const DECODER_BACKUP = process.env.REACT_APP_DECODER_BACKUP;
 export const DECODER_TEST = process.env.REACT_APP_DECODER_TEST;
 export const PROXY_BACKEND = process.env.REACT_APP_PROXY_BACKEND;
+export const SRV_URL = process.env.REACT_APP_SRV_URL;
 
 export const streamFetcher = (ip, path, data, cb) => fetch(`http://${ip}:8081/${path}`, {
     method: 'PUT',
@@ -23,7 +24,7 @@ export const streamFetcher = (ip, path, data, cb) => fetch(`http://${ip}:8081/${
             return response.json().then(respond => cb(respond));
         }
     })
-    .catch(ex => console.log("Put Data error:", ex));
+    .catch(ex => cb(null));
 
 export const proxyFetcher = (data, cb) => fetch(`${PROXY_BACKEND}`, {
     method: 'PUT',
@@ -38,6 +39,14 @@ export const proxyFetcher = (data, cb) => fetch(`${PROXY_BACKEND}`, {
     .catch(ex => console.log("Put Data error:", ex));
 
 export const getData = (path, cb) => fetch(`${JSDB_STATE}/${path}`)
+    .then((response) => {
+        if (response.ok) {
+            return response.json().then(data => cb(data));
+        }
+    })
+    .catch(ex => console.log(`get ${path}`, ex));
+
+export const getService = (path, cb) => fetch(`${SRV_URL}/${path}`)
     .then((response) => {
         if (response.ok) {
             return response.json().then(data => cb(data));
