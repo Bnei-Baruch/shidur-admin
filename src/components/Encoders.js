@@ -140,7 +140,7 @@ class Encoders extends Component {
         });
 
         let services_list = services.map((stream,i) => {
-            return (<Service key={i} index={i} service={services[i]} saveData={this.saveData} />);
+            return (<Service key={i} index={i} service={services[i]} id={id} saveData={this.saveData} />);
         });
 
         return(

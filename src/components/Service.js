@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
-import { Message, Menu, Checkbox, Icon, Label, Popup, Button, Modal, Header, Input } from 'semantic-ui-react'
-//import {getStatus, rstrExec} from "../shared/tools";
+import { Message, Menu, Checkbox, Label } from 'semantic-ui-react'
+import {getService} from "../shared/tools";
 
 class Service extends Component {
 
@@ -17,41 +17,8 @@ class Service extends Component {
         }
     };
 
-    componentDidMount() {
-        let {index} = this.props;
-        // getStatus(index , data => {
-        //     if(data) {
-        //         let timer = data.jsonst.out_time ? data.jsonst.out_time.split(".")[0] : "00:00:00";
-        //         let status = {
-        //             status: data.jsonst.status || "On",
-        //             time: timer,
-        //             progress: data.jsonst.progress
-        //         };
-        //         console.log(status);
-        //         let online = data.jsonst.status === "On";
-        //         if(online) this.runTimer();
-        //         this.setState({status,online});
-        //     }
-        //
-        // })
-    };
-
     componentWillUnmount() {
         clearInterval(this.state.ival);
-    };
-
-    runTimer = () => {
-        let {index} = this.props;
-        // let ival = setInterval(() => getStatus(index , data => {
-        //     let timer = data.jsonst.out_time ? data.jsonst.out_time.split(".")[0] : "00:00:00";
-        //     let status = {
-        //         status: data.jsonst.status,
-        //         time: timer,
-        //         progress: data.jsonst.progress
-        //     };
-        //     this.setState({status});
-        // }), 1000 );
-        // this.setState({ival});
     };
 
     removeStream = () => {
@@ -63,36 +30,12 @@ class Service extends Component {
     };
 
     toggleStream = () => {
-        let {index} = this.props;
+        const {service, id} = this.props;
         let online = !this.state.online;
         this.setState({online});
-        console.log(" :: Toggle stream: " + index,online);
-        if(online) this.startStream();
-        if(!online) this.stopStream();
-    };
-
-    startStream = () => {
-        let {index,db} = this.props;
-        let stream = db.restream[index];
-        console.log(stream)
-        let req = {"id":index, "req":"start", stream};
-        // rstrExec(req,  (data) => {
-        //     console.log(":: Stream Stated :: ",data);
-        //     //this.runTimer();
-        // });
-        this.runTimer();
         this.setDelay();
-    };
-
-    stopStream = () => {
-        let {index} = this.props;
-        let req = {"id":index, "req":"stop"};
-        // rstrExec(req,  (data) => {
-        //     console.log(":: Stream Stopped :: ",data);
-        //     clearInterval(this.state.ival);
-        //     this.setState({online: false})
-        // });
-        this.setDelay();
+        if(online) getService(id + "/stop/" + service.id, () => {})
+        if(!online) getService(id + "/start/" + service.id, () => {})
     };
 
     addUrl = () => {
@@ -109,7 +52,7 @@ class Service extends Component {
         this.setState({delay: true});
         setTimeout(() => {
             this.setState({delay: false});
-        }, 2000);
+        }, 5000);
     };
 
     render() {
