@@ -49,17 +49,18 @@ class Encoders extends Component {
 
     setEncoder = (id, encoder) => {
         console.log(":: Set encoder: ",encoder);
-        this.setState({id, encoder});
-        let value = id.match(/^mac-trl/) ? "trlstat" : "strstat";
-        let req = {"req": value, "id": "status"};
-        streamFetcher(encoder.ip, `encoder`, req,  (data) => {
-            if(data) {
-                let status = data.stdout.replace(/\n/ig, '');
-                console.log(":: Got Encoder status: ",status);
-                this.setState({status});
-            }
+        this.setState({id, encoder}, () => {
             this.runTimer();
         });
+        let value = id.match(/^mac-trl/) ? "trlstat" : "strstat";
+        let req = {"req": value, "id": "status"};
+        // streamFetcher(encoder.ip, `encoder`, req,  (data) => {
+        //     if(data) {
+        //         let status = data.stdout.replace(/\n/ig, '');
+        //         console.log(":: Got Encoder status: ",status);
+        //         this.setState({status});
+        //     }
+        // });
         if(id !== this.props.id)
             this.props.idState("encoder_id", id);
     };
@@ -107,18 +108,17 @@ class Encoders extends Component {
 
     getStat = () => {
         const {encoder, id} = this.state;
-        if(id.match(/^mac-/)) return;
+        //if(id.match(/^mac-/)) return;
         let req = {"req": "encstat", "id": "stream"};
-        streamFetcher(encoder.ip, `encoder`, req, (data) => {
-            let stat = data && data.jsonst ? data.jsonst : {cpu: "", hdd: "", temp: ""};
-            //console.log(":: Got Encoder stat: ", stat);
-            this.setState({stat});
-        });
+        // streamFetcher(encoder.ip, `encoder`, req, (data) => {
+        //     let stat = data && data.jsonst ? data.jsonst : {cpu: "", hdd: "", temp: ""};
+        //     //console.log(":: Got Encoder stat: ", stat);
+        //     this.setState({stat});
+        // });
         getService(id + "/status", (services) => {
             for(let i=0; i<services.length; i++) {
                 services[i].out_time = services[i].log.split('time=')[1].split('.')[0];
             }
-            console.log(services)
             this.setState({services});
         })
     };
@@ -144,7 +144,7 @@ class Encoders extends Component {
         });
 
         return(
-            <Segment textAlign='center' color={status === "On" ? 'green' : 'red'} raised>
+            <Segment textAlign='center' basic >
                 <Label attached='top' size='big' >
                     <Dropdown item text={id ? encoder.description: "Select:"}>
                         <Dropdown.Menu>{enc_options}</Dropdown.Menu>
