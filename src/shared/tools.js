@@ -14,6 +14,15 @@ export const DECODER_TEST = process.env.REACT_APP_DECODER_TEST;
 export const PROXY_BACKEND = process.env.REACT_APP_PROXY_BACKEND;
 export const SRV_URL = process.env.REACT_APP_SRV_URL;
 
+export const toHms = (totalSec) => {
+    let d = parseInt(totalSec / (3600*24));
+    let h = parseInt( totalSec / 3600 , 10) % 24;
+    let m = parseInt( totalSec / 60 , 10) % 60;
+    let s = (totalSec % 60).toFixed(0);
+    if (s < 0) s = 0;
+    return (d > 0 ? d + "d " : "") + (h < 10 ? "0" + h : h) + ":" + (m < 10 ? "0" + m : m) + ":" + (s  < 10 ? "0" + s : s);
+};
+
 export const streamFetcher = (ip, path, data, cb) => fetch(`http://${ip}:8081/${path}`, {
     method: 'PUT',
     headers: {'Content-Type': 'application/json'},

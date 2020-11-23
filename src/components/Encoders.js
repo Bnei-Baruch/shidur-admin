@@ -22,7 +22,7 @@ import {
     dest_options,
     encrec_options,
     streamFetcher,
-    getService
+    getService, toHms
 } from "../shared/tools";
 import Service from "./Service";
 
@@ -117,7 +117,8 @@ class Encoders extends Component {
         // });
         getService(id + "/status", (services) => {
             for(let i=0; i<services.length; i++) {
-                services[i].out_time = services[i].log.split('time=')[1].split('.')[0];
+                //services[i].out_time = services[i].log.split('time=')[1].split('.')[0];
+                services[i].out_time = toHms(services[i].runtime);
             }
             this.setState({services});
         })
