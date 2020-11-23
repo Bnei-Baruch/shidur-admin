@@ -52,15 +52,6 @@ class Encoders extends Component {
         this.setState({id, encoder}, () => {
             this.runTimer();
         });
-        let value = id.match(/^mac-trl/) ? "trlstat" : "strstat";
-        let req = {"req": value, "id": "status"};
-        // streamFetcher(encoder.ip, `encoder`, req,  (data) => {
-        //     if(data) {
-        //         let status = data.stdout.replace(/\n/ig, '');
-        //         console.log(":: Got Encoder status: ",status);
-        //         this.setState({status});
-        //     }
-        // });
         if(id !== this.props.id)
             this.props.idState("encoder_id", id);
     };
@@ -72,28 +63,13 @@ class Encoders extends Component {
     };
 
     startEncoder = () => {
-        this.setState({status: "On"});
-        let {encoder, id} = this.state;
-        let {jsonst} = encoder;
-        let value = id.match(/^mac-trl/) ? "trlout" : "stream";
-        jsonst.id = value;
-        jsonst.req = "start";
-        streamFetcher(encoder.ip, `encoder`, jsonst,  (data) => {
-            console.log(":: Start Encoder status: ",data);
-            //TODO: here we need save state to db
-        });
+        let {id} = this.state;
+        getService(id + "/start", () => {})
     };
 
     stopEncoder = () => {
-        this.setState({status: "Off"});
-        let {encoder, id} = this.state;
-        let {jsonst} = encoder;
-        let value = id.match(/^mac-trl/) ? "trlout" : "stream";
-        jsonst.id = value;
-        jsonst.req = "stop";
-        streamFetcher(encoder.ip, `encoder`, jsonst,  (data) => {
-            console.log(":: Stop Encoder status: ",data);
-        });
+        let {id} = this.state;
+        getService(id + "/stop", () => {})
     };
 
     runTimer = () => {
@@ -107,14 +83,7 @@ class Encoders extends Component {
     };
 
     getStat = () => {
-        const {encoder, id} = this.state;
-        //if(id.match(/^mac-/)) return;
-        let req = {"req": "encstat", "id": "stream"};
-        // streamFetcher(encoder.ip, `encoder`, req, (data) => {
-        //     let stat = data && data.jsonst ? data.jsonst : {cpu: "", hdd: "", temp: ""};
-        //     //console.log(":: Got Encoder stat: ", stat);
-        //     this.setState({stat});
-        // });
+        const {id} = this.state;
         getService(id + "/status", (services) => {
             for(let i=0; i<services.length; i++) {
                 //services[i].out_time = services[i].log.split('time=')[1].split('.')[0];
@@ -191,10 +160,10 @@ class Encoders extends Component {
                         <Menu fluid secondary text>
                             <Menu.Item>
                                 <Button.Group>
-                                    <Button positive disabled={status !== "Off"}
+                                    <Button positive
                                             onClick={this.startEncoder}>Start</Button>
-                                    <Button.Or text='enc'/>
-                                    <Button negative disabled={status !== "On"}
+                                    <Button.Or text='all'/>
+                                    <Button negative
                                             onClick={this.stopEncoder}>Stop</Button>
                                 </Button.Group>
                             </Menu.Item>
