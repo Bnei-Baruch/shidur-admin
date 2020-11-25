@@ -1,11 +1,13 @@
 import React, {Component, Fragment} from 'react'
-import {Tab, Table, Icon, Button, Modal, Header, Input, Menu, Message, Checkbox} from 'semantic-ui-react'
-import {getData, proxyFetcher, putData, removeData} from "../shared/tools";
+import {Tab, Table, Icon, Button, Modal, Header, Input, Menu, Checkbox} from 'semantic-ui-react'
+import {getData, getService, proxyFetcher, putData, removeData, toHms} from "../shared/tools";
+import Service from "./Service";
 
 
 class WebRTC extends Component {
 
     state = {
+        services: [],
         conf: {},
         sadna: {},
         sound: {},
@@ -20,8 +22,13 @@ class WebRTC extends Component {
     };
 
     componentDidMount() {
-        this.statusProxy();
+        //this.statusProxy();
         this.getConf();
+        this.runTimer()
+    };
+
+    componentWillUnmount() {
+        clearInterval(this.state.ival);
     };
 
     getConf = () => {
@@ -98,6 +105,26 @@ class WebRTC extends Component {
         proxyFetcher(req,  (data) => {
             console.log(":: Stop Proxy: ", data);
         });
+    };
+
+    runTimer = () => {
+        this.getStat();
+        if(this.state.ival)
+            clearInterval(this.state.ival);
+        let ival = setInterval(() => {
+            this.getStat();
+        }, 1000);
+        this.setState({ival});
+    };
+
+    getStat = () => {
+        getService("/proxy/status", (services) => {
+            for(let i=0; i<services.length; i++) {
+                //services[i].out_time = services[i].log.split('time=')[1].split('.')[0];
+                services[i].out_time = toHms(services[i].runtime);
+            }
+            this.setState({services});
+        })
     };
 
     renderContent = () => {
@@ -181,9 +208,13 @@ class WebRTC extends Component {
     };
 
     render() {
-        const {sadna,sound,trlout,video,special,servers,open,source,new_prop,status} = this.state;
+        const {sadna,sound,trlout,video,special,servers,open,source,new_prop,services} = this.state;
         const v = (<Icon color='green' name='checkmark' />);
         const x = (<Icon color='red' name='close' />);
+
+        let services_list = services.map((stream,i) => {
+            return (<Service key={i} index={i} service={services[i]} id="proxy" saveData={this.saveData} />);
+        });
 
         let sadna_options = Object.keys(sadna).map((id, i) => {
             let conf = sadna[id];
@@ -411,15 +442,17 @@ class WebRTC extends Component {
                 </Modal.Actions>
             </Modal>
 
-                <Message className='or_buttons' >
-                    <Button.Group >
-                        <Button positive disabled={status !== "Off"}
-                                onClick={this.startProxy}>Start</Button>
-                        <Button.Or text='udp' />
-                        <Button negative disabled={status !== "On"}
-                                onClick={this.stopProxy}>Stop</Button>
-                    </Button.Group>
-                </Message>
+                {services_list}
+
+                {/*<Message className='or_buttons' >*/}
+                {/*    <Button.Group >*/}
+                {/*        <Button positive disabled={status !== "Off"}*/}
+                {/*                onClick={this.startProxy}>Start</Button>*/}
+                {/*        <Button.Or text='udp' />*/}
+                {/*        <Button negative disabled={status !== "On"}*/}
+                {/*                onClick={this.stopProxy}>Stop</Button>*/}
+                {/*    </Button.Group>*/}
+                {/*</Message>*/}
             </Fragment>
         );
     }
