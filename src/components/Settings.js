@@ -28,7 +28,7 @@ class Settings extends Component {
     };
 
     addNew = (conf, new_prop) => {
-        let props = {name: "", ip: "", description: "", jsonst: {}};
+        let props = {name: "", ip: "", description: "", jsonst: {}, services: []};
         this.setState({open: true, new_prop, props, conf, id: ""});
     };
 
@@ -40,6 +40,26 @@ class Settings extends Component {
     setValue = (key, value) => {
         const {props} = this.state;
         props[key] = value;
+        this.setState({props});
+    };
+
+    setServ = (key, value, i) => {
+        const {props} = this.state;
+        if(key === "args") {
+            value = value.split(" ");
+        }
+        props.services[i][key] = value
+        console.log(props)
+        this.setState({props});
+    };
+
+    newServ = () => {
+        const {props} = this.state;
+        if(!props.services) {
+            props.services = [];
+        }
+        props.services.push({id: "", name: "", args: []});
+        console.log(props)
         this.setState({props});
     };
 
@@ -66,7 +86,7 @@ class Settings extends Component {
 
     renderContent = () => {
         const {props} = this.state;
-        let {name, ip, description} = props;
+        let {name, ip, description, services = []} = props;
         return (
             <Table compact='very' basic>
                 <Table.Header>
@@ -78,12 +98,31 @@ class Settings extends Component {
                 </Table.Header>
 
                 <Table.Body>
-                    <Table.Row className="monitor_tr">
+                    <Table.Row className="table_header">
                         <Table.Cell><Input value={name} onChange={(e) => this.setValue("name", e.target.value)} /></Table.Cell>
                         <Table.Cell><Input value={ip} onChange={(e) => this.setValue("ip", e.target.value)} /></Table.Cell>
                         <Table.Cell><Input value={description} onChange={(e) => this.setValue("description", e.target.value)} /></Table.Cell>
                     </Table.Row>
+                    {services.map((s, i) => {
+                        let {id, name , args} = s;
+                        args = args.join(" ");
+                        return (
+                            <Table.Row key={i} >
+                                <Table.Cell><Input value={id} onChange={(e) => this.setServ("id", e.target.value, i)} /></Table.Cell>
+                                <Table.Cell><Input value={name} onChange={(e) => this.setServ("name", e.target.value, i)} /></Table.Cell>
+                                <Table.Cell><Input value={args} onChange={(e) => this.setServ("args", e.target.value, i)} /></Table.Cell>
+                            </Table.Row>
+                        )
+                    })}
                 </Table.Body>
+
+                <Table.Footer>
+                    <Table.Row>
+                        <Table.HeaderCell colSpan='3'>
+                            <Button size="mini" fluid onClick={this.newServ}>Add Service</Button>
+                        </Table.HeaderCell>
+                    </Table.Row>
+                </Table.Footer>
             </Table>
         )
     };
