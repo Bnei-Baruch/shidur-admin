@@ -14,6 +14,9 @@ export const DECODER_TEST = process.env.REACT_APP_DECODER_TEST;
 export const PROXY_BACKEND = process.env.REACT_APP_PROXY_BACKEND;
 export const SRV_URL = process.env.REACT_APP_SRV_URL;
 
+export const RS_STATE = process.env.REACT_APP_RS_STATE;
+export const RS_BACKEND = process.env.REACT_APP_RS_BACKEND;
+
 export const toHms = (totalSec) => {
     let d = parseInt(totalSec / (3600*24));
     let h = parseInt( totalSec / 3600 , 10) % 24;
@@ -21,6 +24,17 @@ export const toHms = (totalSec) => {
     let s = (totalSec % 60).toFixed(0);
     if (s < 0) s = 0;
     return (d > 0 ? d + "d " : "") + (h < 10 ? "0" + h : h) + ":" + (m < 10 ? "0" + m : m) + ":" + (s  < 10 ? "0" + s : s);
+};
+
+export const totalSeconds = (time) => {
+    let parts = time.split(':');
+    return parts[0] * 3600 + parts[1] * 60 + parts[2];
+};
+
+export const getPercent = (total,current) => {
+    let percent = (100 * totalSeconds(current) / totalSeconds(total)).toFixed(0);
+    percent = +percent || 0;
+    return percent;
 };
 
 export const streamFetcher = (ip, path, data, cb) => fetch(`http://${ip}:8081/${path}`, {
@@ -180,3 +194,47 @@ export const buffer_options = [
     { key: '200', text: '200ms', value: '200' },
     { key: '100', text: '100ms', value: '100' },
 ];
+
+export const getRstrData = (cb) => fetch(`${RS_STATE}`)
+    .then((response) => {
+        if (response.ok) {
+            return response.json().then(data => cb(data));
+        }
+    })
+    .catch(ex => console.log(`getData`, ex));
+
+export const putRstrData = (data, cb) => fetch(`${RS_STATE}`, {
+    method: 'PUT',
+    headers: {'Content-Type': 'application/json'},
+    body:  JSON.stringify(data)
+})
+    .then((response) => {
+        if (response.ok) {
+            return response.json().then(respond => cb(respond));
+        }
+    })
+    .catch(ex => console.log("Put Data error:", ex));
+
+export const rstrExec = (data, cb) => fetch(`${RS_BACKEND}/exec`, {
+    method: 'PUT',
+    headers: {'Content-Type': 'application/json'},
+    body:  JSON.stringify(data)
+})
+    .then((response) => {
+        if (response.ok) {
+            return response.json().then(respond => cb(respond));
+        }
+    })
+    .catch(ex => console.log("Put Data error:", ex));
+
+export const rstrStatus = (id,cb) => {
+    fetch(`${RS_BACKEND}/status?id=${id}`)
+        .then((response) => {
+            if (response.ok) {
+                return response.json().then(data => cb(data));
+            } else {
+                cb(null)
+            }
+        })
+        .catch(ex => console.log(`getStatus`, ex));
+};

@@ -3,6 +3,7 @@ import { Container, Tab } from 'semantic-ui-react'
 import 'semantic-ui-css/semantic.min.css';
 import './App.css';
 import {getData, putData} from "./shared/tools";
+import Restreamer from "./components/Restreamer";
 import Encoders from "./components/Encoders";
 import Decoders from "./components/Decoders";
 import Captures from "./components/Captures";
@@ -62,6 +63,10 @@ class App extends Component {
       const {encoders,decoders,captures,playouts,workflows,encoder_id,decoder_id,capture_id,playout_id,workflow_id} = this.state;
 
       const panes = [
+          { menuItem: { key: 'coder', icon: 'sitemap', content: 'Restream' },
+              render: () => <Tab.Pane attached={false} >
+                  <Restreamer />
+              </Tab.Pane> },
           { menuItem: { key: 'encoder', icon: 'photo', content: 'Encoders' },
               render: () => <Tab.Pane attached={true} >
                   <Encoders jsonState={this.setJsonState}
