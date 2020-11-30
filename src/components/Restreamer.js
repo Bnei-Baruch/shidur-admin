@@ -49,6 +49,15 @@ class Restreamer extends Component {
         this.saveData(restream[id])
     };
 
+    addNote = (i, description) => {
+        const {restream} = this.props;
+        const {id} = this.state;
+        console.log(restream[id].services);
+        restream[id].services[i].description = description;
+        console.log(restream[id]);
+        this.saveData(restream[id])
+    };
+
     saveData = (props) => {
         putData(`streamer/restream/live-proxy`, props, (data) => {
             console.log("saveProp callback: ", data);
@@ -87,12 +96,11 @@ class Restreamer extends Component {
     };
 
     render() {
-
-        const {restream} = this.props;
-        const {rsid, id, status, stat, services, language} = this.state;
+        const {rsid, id, services, language} = this.state;
 
         let services_list = services.map((stream,i) => {
-            return (<Service key={i} index={i} service={services[i]} id={id} saveData={this.saveData} removeRestream={this.delRestream} />);
+            return (<Service key={i} index={i} service={services[i]} id={id}
+                             saveData={this.saveData} removeRestream={this.delRestream} addNote={this.addNote} />);
         });
 
         return(

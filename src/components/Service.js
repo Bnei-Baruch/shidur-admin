@@ -35,10 +35,9 @@ class Service extends Component {
         if(!online) getService(id + "/start/" + service.id, () => {})
     };
 
-    addUrl = () => {
-        let {index,db} = this.props;
-        db.restream[index].url = this.state.url;
-        this.props.saveData(db);
+    addNote = () => {
+        let {index} = this.props;
+        this.props.addNote(index, this.state.url);
         this.setState({ open: false });
     };
 
@@ -54,9 +53,9 @@ class Service extends Component {
 
     render() {
 
-        const {index, service} = this.props;
+        const {service} = this.props;
         const {name,id,out_time,alive,description} = service;
-        const {online,status,delay} = this.state;
+        const {delay} = this.state;
 
         return (
             <Message className='service' floating >
@@ -75,7 +74,7 @@ class Service extends Component {
                     </Menu.Item>
                     <Menu.Item position='right'>
                         <Popup inverted flowing position='top center' content={description} trigger={
-                            <Button icon='comment alternate' onClick={this.open}>{}</Button>} />
+                            <Button basic circular icon='linkify' onClick={this.open}>{}</Button>} />
                         <Modal
                             open={this.state.open}
                             onClose={this.close}
@@ -84,11 +83,11 @@ class Service extends Component {
                         >
                             <Header icon='browser' content={id +' : '+ name} />
                             <Modal.Content>
-                                <Input type='text' placeholder='Enter URL...'
+                                <Input type='text' placeholder='Enter Note...'
                                        value={this.state.url} action fluid
                                        onChange={e => this.setState({url: e.target.value})}>
                                     <input />
-                                    <Button size='big' color='green' onClick={this.addUrl}>Add</Button>
+                                    <Button size='big' color='green' onClick={this.addNote}>Add</Button>
                                 </Input>
                             </Modal.Content>
                         </Modal>
