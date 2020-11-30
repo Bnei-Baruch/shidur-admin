@@ -1,13 +1,21 @@
 import React, {Component} from 'react'
-import { Divider, Segment, Label, Input, Button, Select } from 'semantic-ui-react'
-import {getRstrData, putRstrData} from "../shared/tools";
-import Streams from "./Streams";
+import {Divider, Segment, Label, Button, Select} from 'semantic-ui-react'
+import {getService, id_options, putData, rstr_options, toHms} from "../shared/tools";
+import Service from "./Service";
 
 class Restreamer extends Component {
 
     state = {
+        restream: {},
+        id: "live-proxy",
+        ival: null,
+        services: [],
+        status: "",
+
+        description: "",
         name: "",
         language: "heb",
+        rsid: "fb",
         url: "",
         db: {
             restream: []
@@ -15,59 +23,93 @@ class Restreamer extends Component {
     };
 
     componentDidMount() {
-        getRstrData(db => {
-            console.log(":: Got restream: ",db);
-            this.setState({db});
+        this.runTimer();
+    };
+
+    componentWillUnmount() {
+        clearInterval(this.state.ival);
+    };
+
+    addRestream = () => {
+        const {restream} = this.props;
+        const {rsid, language, description, id} = this.state;
+        if(!restream[id].services) {
+            restream[id].services = [];
+        }
+        restream[id].services.push({description, id: language + "-" + rsid, name: "ffmpeg", args: []});
+        console.log(restream[id]);
+        this.saveData(restream[id])
+    };
+
+    delRestream = (i) => {
+        const {restream} = this.props;
+        const {id} = this.state;
+        restream[id].services.splice(i, 1);
+        console.log(restream[id], i);
+        this.saveData(restream[id])
+    };
+
+    saveData = (props) => {
+        putData(`streamer/restream/live-proxy`, props, (data) => {
+            console.log("saveProp callback: ", data);
         });
     };
 
-    addRestream = (del) => {
-        let {db,name,language,url} = this.state;
-        db.restream.push({name,language,url});
-        this.saveData(db);
+    startEncoder = () => {
+        let {id} = this.state;
+        getService(id + "/start", () => {})
     };
 
-    saveData = (db) => {
-        putRstrData(db, (data) => {
-            console.log(" :: Save restream callback: ", data);
-            this.setState({db});
-        });
+    stopEncoder = () => {
+        let {id} = this.state;
+        getService(id + "/stop", () => {})
+    };
+
+    runTimer = () => {
+        this.getStat();
+        if(this.state.ival)
+            clearInterval(this.state.ival);
+        let ival = setInterval(() => {
+            this.getStat();
+        }, 1000);
+        this.setState({ival});
+    };
+
+    getStat = () => {
+        const {id} = this.state;
+        getService(id + "/status", (services) => {
+            for(let i=0; i<services.length; i++) {
+                //services[i].out_time = services[i].log.split('time=')[1].split('.')[0];
+                services[i].out_time = toHms(services[i].runtime);
+            }
+            this.setState({services});
+        })
     };
 
     render() {
 
-        const {db,name,language} = this.state;
+        const {restream} = this.props;
+        const {rsid, id, status, stat, services, language} = this.state;
 
-        const options = [
-            { key: 'heb', text: 'Hebrew', value: 'heb' },
-            { key: 'rus', text: 'Russian', value: 'rus' },
-            { key: 'eng', text: 'English', value: 'eng' },
-            { key: 'spa', text: 'Spanish', value: 'spa' },
-            { key: 'fre', text: 'French', value: 'fre' },
-            { key: 'ita', text: 'Italian', value: 'ita' },
-            { key: 'ger', text: 'German', value: 'ger' },
-            { key: 'por', text: 'Portuguese', value: 'por' },
-            { key: 'ukr', text: 'Ukraine', value: 'ukr' },
-        ];
-
-        let streams = db.restream.map((stream,i) => {
-            return (<Streams key={i} index={i} {...this.state} saveData={this.saveData} />);
+        let services_list = services.map((stream,i) => {
+            return (<Service key={i} index={i} service={services[i]} id={id} saveData={this.saveData} removeRestream={this.delRestream} />);
         });
 
         return(
             <Segment padded textAlign='center' color='brown'>
+                <Divider />
+
                 <Label size='big' >
-                    <Select compact options={options} value={language} size='big'
+                    <Select compact options={rstr_options} value={language} size='big'
                             onChange={(e, {value}) => this.setState({language: value})} />
-                    <Input type='text' placeholder='Type name...'
-                           value={name} action
-                           onChange={e => this.setState({name: e.target.value})}>
-                        <input />
-                        <Button size='big' color='green' onClick={this.addRestream}>Add</Button>
-                    </Input>
+                    <Select compact options={id_options} value={rsid} size='big'
+                            onChange={(e, {value}) => this.setState({rsid: value})} />
+                    <Button size='big' color='green' onClick={this.addRestream}>Add</Button>
                 </Label>
                 <Divider />
-                {streams}
+
+                {services_list}
+
             </Segment>
         );
     }

@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import { Message, Menu, Checkbox, Label } from 'semantic-ui-react'
+import { Message, Menu, Checkbox, Label, Icon, Popup, Modal, Button, Input, Header } from 'semantic-ui-react'
 import {getService} from "../shared/tools";
 
 class Service extends Component {
@@ -22,11 +22,8 @@ class Service extends Component {
     };
 
     removeStream = () => {
-        let {index,db} = this.props;
-        let stream = db.restream[index];
-        db.restream.splice(index, 1);
-        console.log(stream);
-        this.props.saveData(db);
+        let {index} = this.props;
+        this.props.removeRestream(index);
     };
 
     toggleStream = () => {
@@ -58,7 +55,7 @@ class Service extends Component {
     render() {
 
         const {index, service} = this.props;
-        const {name,id,out_time,alive} = service;
+        const {name,id,out_time,alive,description} = service;
         const {online,status,delay} = this.state;
 
         return (
@@ -74,31 +71,35 @@ class Service extends Component {
                             {id}
                         </Label>
                     </Menu.Item>
-                    {/*<Menu.Item>*/}
-                    {/*    <Popup inverted flowing position='top center' content={name} trigger={*/}
-                    {/*        <Button color='blue' onClick={this.open}>{name}</Button>} />*/}
-                    {/*    <Modal*/}
-                    {/*        open={this.state.open}*/}
-                    {/*        onClose={this.close}*/}
-                    {/*        basic*/}
-                    {/*        size='small'*/}
-                    {/*    >*/}
-                    {/*        <Header icon='browser' content={id +' : '+ name} />*/}
-                    {/*        <Modal.Content>*/}
-                    {/*            <Input type='text' placeholder='Enter URL...'*/}
-                    {/*                   value={this.state.url} action fluid*/}
-                    {/*                   onChange={e => this.setState({url: e.target.value})}>*/}
-                    {/*                <input />*/}
-                    {/*                <Button size='big' color='green' onClick={this.addUrl}>Add</Button>*/}
-                    {/*            </Input>*/}
-                    {/*        </Modal.Content>*/}
-                    {/*    </Modal>*/}
-                    {/*</Menu.Item>*/}
+                    <Menu.Item>
+                    </Menu.Item>
+                    <Menu.Item position='right'>
+                        <Popup inverted flowing position='top center' content={description} trigger={
+                            <Button icon='comment alternate' onClick={this.open}>{}</Button>} />
+                        <Modal
+                            open={this.state.open}
+                            onClose={this.close}
+                            basic
+                            size='small'
+                        >
+                            <Header icon='browser' content={id +' : '+ name} />
+                            <Modal.Content>
+                                <Input type='text' placeholder='Enter URL...'
+                                       value={this.state.url} action fluid
+                                       onChange={e => this.setState({url: e.target.value})}>
+                                    <input />
+                                    <Button size='big' color='green' onClick={this.addUrl}>Add</Button>
+                                </Input>
+                            </Modal.Content>
+                        </Modal>
+                    </Menu.Item>
                     <Menu.Item position='right'>
                         <Label size='big' color={alive ? 'green' : 'red'}>
                             {out_time}
                         </Label>
-                        {/*<Icon link name='close' onClick={this.removeStream} />*/}
+                    </Menu.Item>
+                    <Menu.Item position='right'>
+                        {this.props.id === "live-proxy" ? <Icon link name='close' onClick={this.removeStream} /> : null}
                     </Menu.Item>
                 </Menu>
             </Message>

@@ -21,26 +21,28 @@ class App extends Component {
         captures:{},
         playouts:{},
         workflows:{},
+        restream:{},
         encoder_id: null,
         decoder_id: null,
         capture_id: null,
         playout_id: null,
         workflow_id: null,
+        restream_id: null,
     };
 
     componentDidMount() {
         getData(`streamer`, (streamer) => {
             console.log(":: Got streamer: ",streamer);
-            const {encoders,decoders,captures,playouts,workflows} = streamer;
-            this.setState({encoders,decoders,captures,playouts,workflows});
+            const {encoders,decoders,captures,playouts,workflows,restream} = streamer;
+            this.setState({encoders,decoders,captures,playouts,workflows,restream});
         });
     };
 
     getState = () => {
         getData(`streamer`, (streamer) => {
             console.log(":: Got streamer: ",streamer);
-            const {encoders,decoders,captures,playouts,workflows} = streamer;
-            this.setState({encoders,decoders,captures,playouts,workflows});
+            const {encoders,decoders,captures,playouts,workflows,restream} = streamer;
+            this.setState({encoders,decoders,captures,playouts,workflows,restream});
         });
     };
 
@@ -60,12 +62,15 @@ class App extends Component {
 
   render() {
 
-      const {encoders,decoders,captures,playouts,workflows,encoder_id,decoder_id,capture_id,playout_id,workflow_id} = this.state;
+      const {encoders,decoders,captures,playouts,workflows,restream,encoder_id,decoder_id,capture_id,playout_id,workflow_id,restream_id} = this.state;
 
       const panes = [
-          { menuItem: { key: 'coder', icon: 'sitemap', content: 'Restream' },
-              render: () => <Tab.Pane attached={false} >
-                  <Restreamer />
+          { menuItem: { key: 'restream', icon: 'sitemap', content: 'LiveProxy' },
+              render: () => <Tab.Pane attached={true} >
+                  <Restreamer jsonState={this.setJsonState}
+                            idState={this.setIdState}
+                            id={restream_id}
+                            restream={restream} />
               </Tab.Pane> },
           { menuItem: { key: 'encoder', icon: 'photo', content: 'Encoders' },
               render: () => <Tab.Pane attached={true} >

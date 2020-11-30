@@ -195,6 +195,23 @@ export const buffer_options = [
     { key: '100', text: '100ms', value: '100' },
 ];
 
+export const rstr_options = [
+    { key: 'heb', text: 'Hebrew', value: 'heb' },
+    { key: 'rus', text: 'Russian', value: 'rus' },
+    { key: 'eng', text: 'English', value: 'eng' },
+    { key: 'spa', text: 'Spanish', value: 'spa' },
+    { key: 'fre', text: 'French', value: 'fre' },
+    { key: 'ita', text: 'Italian', value: 'ita' },
+    { key: 'ger', text: 'German', value: 'ger' },
+    { key: 'por', text: 'Portuguese', value: 'por' },
+    { key: 'ukr', text: 'Ukraine', value: 'ukr' },
+];
+
+export const id_options = [
+    { key: 'yt', text: 'YouTube', value: 'yt' },
+    { key: 'fb', text: 'Facebook', value: 'fb' },
+];
+
 export const getRstrData = (cb) => fetch(`${RS_STATE}`)
     .then((response) => {
         if (response.ok) {
