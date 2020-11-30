@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 import {Divider, Segment, Label, Button, Select} from 'semantic-ui-react'
-import {getService, id_options, putData, rstr_options, toHms} from "../shared/tools";
+import {getService, getStreamUrl, id_options, putData, rstr_options, toHms} from "../shared/tools";
 import Service from "./Service";
 
 class Restreamer extends Component {
@@ -37,25 +37,28 @@ class Restreamer extends Component {
             restream[id].services = [];
         }
         restream[id].services.push({description, id: language + "-" + rsid, name: "ffmpeg", args: []});
-        console.log(restream[id]);
         this.saveData(restream[id])
     };
 
     delRestream = (i) => {
         const {restream} = this.props;
-        const {id} = this.state;
+        const {id, services} = this.state;
+        if(services[i].alive)
+            return;
         restream[id].services.splice(i, 1);
-        console.log(restream[id], i);
         this.saveData(restream[id])
     };
 
     addNote = (i, description) => {
         const {restream} = this.props;
         const {id} = this.state;
-        console.log(restream[id].services);
         restream[id].services[i].description = description;
-        console.log(restream[id]);
-        this.saveData(restream[id])
+        getStreamUrl(this.state.language, url => {
+            let cmd = `-progress stat_${id}.log -hide_banner -re -i ${url} -c copy -bsf:a aac_adtstoasc -f flv ${description}`
+            let arg = cmd.split(" ");
+            restream[id].services[i].args = arg;
+            this.saveData(restream[id])
+        });
     };
 
     saveData = (props) => {
@@ -87,11 +90,15 @@ class Restreamer extends Component {
     getStat = () => {
         const {id} = this.state;
         getService(id + "/status", (services) => {
-            for(let i=0; i<services.length; i++) {
-                //services[i].out_time = services[i].log.split('time=')[1].split('.')[0];
-                services[i].out_time = toHms(services[i].runtime);
+            if(services) {
+                for(let i=0; i<services.length; i++) {
+                    //services[i].out_time = services[i].log.split('time=')[1].split('.')[0];
+                    services[i].out_time = toHms(services[i].runtime);
+                }
+                this.setState({services});
+            } else {
+                this.setState({services: []});
             }
-            this.setState({services});
         })
     };
 

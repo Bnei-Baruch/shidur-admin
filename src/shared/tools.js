@@ -13,6 +13,7 @@ export const DECODER_BACKUP = process.env.REACT_APP_DECODER_BACKUP;
 export const DECODER_TEST = process.env.REACT_APP_DECODER_TEST;
 export const PROXY_BACKEND = process.env.REACT_APP_PROXY_BACKEND;
 export const SRV_URL = process.env.REACT_APP_SRV_URL;
+export const LIVE_URL = process.env.REACT_APP_LIVE_URL;
 
 export const RS_STATE = process.env.REACT_APP_RS_STATE;
 export const RS_BACKEND = process.env.REACT_APP_RS_BACKEND;
@@ -68,6 +69,20 @@ export const getData = (path, cb) => fetch(`${JSDB_STATE}/${path}`)
         }
     })
     .catch(ex => console.log(`get ${path}`, ex));
+
+export const getStreamUrl = (lang, cb) => {
+    const qv = lang.match(/^(heb|rus|eng|fre|spa|ita|ger)$/) ? "hd" : "high";
+    fetch(`${LIVE_URL}-${lang}-${qv}.js`)
+        .then((response) => {
+            if (response.ok) {
+                return response.text().then(data => {
+                    let url = JSON.parse(data.split("(")[1].split(")")[0])
+                    cb(url.hlsUrl)
+                })
+            }
+        })
+        .catch(ex => console.log(`get ${lang}`, ex));
+};
 
 export const getService = (path, cb) => fetch(`${SRV_URL}/${path}`)
     .then((response) => {

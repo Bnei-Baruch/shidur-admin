@@ -28,7 +28,7 @@ class Service extends Component {
 
     toggleStream = () => {
         const {service, id} = this.props;
-        let online = !this.state.online;
+        let online = service.alive;
         this.setState({online});
         this.setDelay();
         if(online) getService(id + "/stop/" + service.id, () => {})
@@ -54,14 +54,14 @@ class Service extends Component {
     render() {
 
         const {service} = this.props;
-        const {name,id,out_time,alive,description} = service;
+        const {id,out_time,alive,description} = service;
         const {delay} = this.state;
 
         return (
             <Message className='service' floating >
                 <Menu secondary>
                     <Menu.Item>
-                        <Checkbox toggle disabled={delay}
+                        <Checkbox toggle disabled={delay || (this.props.id === "live-proxy" && !description)}
                                   checked={alive}
                                   onChange={this.toggleStream} />
                     </Menu.Item>
@@ -81,9 +81,9 @@ class Service extends Component {
                             basic
                             size='small'
                         >
-                            <Header icon='browser' content={id +' : '+ name} />
+                            <Header icon='browser' content={id} />
                             <Modal.Content>
-                                <Input type='text' placeholder='Enter Note...'
+                                <Input type='text' placeholder='Type here...'
                                        value={this.state.url} action fluid
                                        onChange={e => this.setState({url: e.target.value})}>
                                     <input />
