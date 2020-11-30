@@ -118,7 +118,7 @@ class WebRTC extends Component {
     };
 
     getStat = () => {
-        getService("/proxy/status", (services) => {
+        getService("udp-proxy/status", (services) => {
             for(let i=0; i<services.length; i++) {
                 //services[i].out_time = services[i].log.split('time=')[1].split('.')[0];
                 services[i].out_time = toHms(services[i].runtime);
@@ -213,7 +213,7 @@ class WebRTC extends Component {
         const x = (<Icon color='red' name='close' />);
 
         let services_list = services.map((stream,i) => {
-            return (<Service key={i} index={i} service={services[i]} id="proxy" saveData={this.saveData} />);
+            return (<Service key={i} index={i} service={services[i]} id="udp-proxy" saveData={this.saveData} />);
         });
 
         let sadna_options = Object.keys(sadna).map((id, i) => {
