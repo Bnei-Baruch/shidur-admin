@@ -36,7 +36,8 @@ class Restreamer extends Component {
         if(!restream[id].services) {
             restream[id].services = [];
         }
-        restream[id].services.push({description, id: language + "-" + rsid, name: "ffmpeg", args: []});
+        const srv_id = language + "-" + rsid + "-" + (restream[id].services.length + 1).toString();
+        restream[id].services.push({description, id: srv_id, name: "ffmpeg", args: []});
         this.saveData(restream[id])
     };
 
