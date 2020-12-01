@@ -14,7 +14,7 @@ export const DECODER_TEST = process.env.REACT_APP_DECODER_TEST;
 export const PROXY_BACKEND = process.env.REACT_APP_PROXY_BACKEND;
 export const SRV_URL = process.env.REACT_APP_SRV_URL;
 export const LIVE_URL = process.env.REACT_APP_LIVE_URL;
-
+export const KC_URL = process.env.REACT_APP_KC_URL;
 export const RS_STATE = process.env.REACT_APP_RS_STATE;
 export const RS_BACKEND = process.env.REACT_APP_RS_BACKEND;
 
