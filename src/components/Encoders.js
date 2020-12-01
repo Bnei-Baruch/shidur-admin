@@ -1,29 +1,6 @@
 import React, {Component} from 'react'
-import {
-    Divider,
-    Table,
-    Segment,
-    Label,
-    Dropdown,
-    Select,
-    Message,
-    Button,
-    List,
-    Menu,
-    Checkbox
-} from 'semantic-ui-react'
-import {
-    channels_options,
-    vres_options,
-    vrate_options,
-    arate_options,
-    protocol_options,
-    encstr_options,
-    dest_options,
-    encrec_options,
-    streamFetcher,
-    getService, toHms
-} from "../shared/tools";
+import {Divider, Table, Segment, Label, Dropdown, Message, Button, List, Menu, Checkbox} from 'semantic-ui-react'
+import {getService, toHms, putData} from "../shared/tools";
 import Service from "./Service";
 
 
@@ -54,6 +31,19 @@ class Encoders extends Component {
         });
         if(id !== this.props.id)
             this.props.idState("encoder_id", id);
+    };
+
+    addNote = (i, description) => {
+        const {encoder} = this.state;
+        encoder.services[i].description = description;
+        this.saveData(encoder);
+    };
+
+    saveData = (props) => {
+        const {id} = this.state;
+        putData(`streamer/encoders/${id}`, props, (data) => {
+            console.log("saveProp callback: ", data);
+        });
     };
 
     setJsonState = (key, value) => {
@@ -110,7 +100,7 @@ class Encoders extends Component {
         });
 
         let services_list = services.map((stream,i) => {
-            return (<Service key={i} index={i} service={services[i]} id={id} saveData={this.saveData} />);
+            return (<Service key={i} index={i} service={services[i]} id={id} saveData={this.saveData} addNote={this.addNote} />);
         });
 
         return(
