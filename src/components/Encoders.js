@@ -33,6 +33,26 @@ class Encoders extends Component {
             this.props.idState("encoder_id", id);
     };
 
+    addService = () => {
+        const {encoder, description} = this.state;
+        if(!encoder.services) {
+            encoder.services = [];
+        }
+        const id = "janus-" + (encoder.services.length + 1).toString();
+        const cmd = `janus.py --play-from video.mp4 --room 1051 https://gxy8.kli.one/janusgxy`;
+        const args = cmd.split(" ");
+        encoder.services.push({description, id, name: "python3", args});
+        this.saveData(encoder)
+    };
+
+    delService = (i) => {
+        const {encoder} = this.state;
+        if(encoder.alive)
+            return;
+        encoder.services.splice(i, 1);
+        this.saveData(encoder)
+    };
+
     addNote = (i, description) => {
         const {encoder} = this.state;
         encoder.services[i].description = description;
@@ -75,11 +95,15 @@ class Encoders extends Component {
     getStat = () => {
         const {id} = this.state;
         getService(id + "/status", (services) => {
-            for(let i=0; i<services.length; i++) {
-                //services[i].out_time = services[i].log.split('time=')[1].split('.')[0];
-                services[i].out_time = toHms(services[i].runtime);
+            if(services) {
+                for(let i=0; i<services.length; i++) {
+                    //services[i].out_time = services[i].log.split('time=')[1].split('.')[0];
+                    services[i].out_time = toHms(services[i].runtime);
+                }
+                this.setState({services});
+            } else {
+                this.setState({services: []});
             }
-            this.setState({services});
         })
     };
 
@@ -100,7 +124,8 @@ class Encoders extends Component {
         });
 
         let services_list = services.map((stream,i) => {
-            return (<Service key={i} index={i} service={services[i]} id={id} saveData={this.saveData} addNote={this.addNote} />);
+            return (<Service key={i} index={i} service={services[i]} id={id}
+                             saveData={this.saveData} removeRestream={this.delService} addNote={this.addNote} />);
         });
 
         return(
@@ -144,6 +169,18 @@ class Encoders extends Component {
                 : null}
 
                 {services_list}
+
+                {id === "galaxy-test" ?
+                    <div><Divider />
+                        {/*<Label size='big' >*/}
+                        {/*<Select compact options={rstr_options} value={language} size='big'*/}
+                        {/*        onChange={(e, {value}) => this.setState({language: value})} />*/}
+                        {/*<Select compact options={id_options} value={rsid} size='big'*/}
+                        {/*        onChange={(e, {value}) => this.setState({rsid: value})} />*/}
+                        <Button size='mini' color='blue' fluid onClick={this.addService}>Add</Button>
+                        {/*</Label>*/}
+                        <Divider /></div>
+                    : null}
 
                 {!id ? null :
                     <Message className='or_buttons'>

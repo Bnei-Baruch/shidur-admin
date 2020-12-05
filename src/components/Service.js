@@ -98,7 +98,7 @@ class Service extends Component {
                         </Label>
                     </Menu.Item>
                     <Menu.Item position='right'>
-                        {this.props.id === "live-proxy" ? <Icon link name='close' onClick={this.removeStream} /> : null}
+                        {this.props.id.match(/^(live-proxy|galaxy-test)$/) ? <Icon link name='close' onClick={this.removeStream} /> : null}
                     </Menu.Item>
                 </Menu>
             </Message>
