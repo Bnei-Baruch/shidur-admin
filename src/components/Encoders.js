@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
-import {Divider, Table, Segment, Label, Dropdown, Message, Button, List, Menu, Checkbox} from 'semantic-ui-react'
-import {getService, toHms, putData} from "../shared/tools";
+import {Divider, Table, Segment, Label, Dropdown, Message, Button, List, Menu, Checkbox, Select} from 'semantic-ui-react'
+import {getService, toHms, putData, getRooms} from "../shared/tools";
 import Service from "./Service";
 
 
@@ -9,6 +9,8 @@ class Encoders extends Component {
     state = {
         encoder: {},
         id: "",
+        room: {"room":1051,"janus":"gxy8","description":"Test Room","questions":false,"num_users":0,"users":null,"region":"","extra":null},
+        rooms: [{"room":1051,"janus":"gxy8","description":"Test Room","questions":false,"num_users":0,"users":null,"region":"","extra":null}],
         ival: null,
         services: [],
         status: "",
@@ -26,6 +28,12 @@ class Encoders extends Component {
 
     setEncoder = (id, encoder) => {
         console.log(":: Set encoder: ",encoder);
+        if(id === "galaxy-test") {
+            getRooms(data => {
+                let rooms = data.rooms.filter(r => r.janus === "gxy8");
+                this.setState({rooms})
+            });
+        }
         this.setState({id, encoder}, () => {
             this.runTimer();
         });
@@ -34,12 +42,13 @@ class Encoders extends Component {
     };
 
     addService = () => {
-        const {encoder, description} = this.state;
+        const {encoder, room} = this.state;
         if(!encoder.services) {
             encoder.services = [];
         }
         const id = "janus-" + (encoder.services.length + 1).toString();
-        const cmd = `janus.py --play-from video.mp4 --room 1051 https://gxy8.kli.one/janusgxy`;
+        const description = room.description;
+        const cmd = `janus.py --play-from video.mp4 --room ${room.room} https://gxy8.kli.one/janusgxy`;
         const args = cmd.split(" ");
         encoder.services.push({description, id, name: "python3", args});
         this.saveData(encoder)
@@ -110,7 +119,11 @@ class Encoders extends Component {
     render() {
 
         const {encoders} = this.props;
-        const {encoder, id, status, stat, services} = this.state;
+        const {encoder, id, status, stat, services, room, rooms} = this.state;
+
+        let rooms_options = rooms.map((r, i) => {
+            return({ key: i, text: r.description, value: r });
+        });
 
         let enc_options = Object.keys(encoders).map((id, i) => {
             let encoder = encoders[id];
@@ -168,19 +181,18 @@ class Encoders extends Component {
                     </Table>
                 : null}
 
-                {services_list}
-
                 {id === "galaxy-test" ?
                     <div><Divider />
-                        {/*<Label size='big' >*/}
-                        {/*<Select compact options={rstr_options} value={language} size='big'*/}
-                        {/*        onChange={(e, {value}) => this.setState({language: value})} />*/}
-                        {/*<Select compact options={id_options} value={rsid} size='big'*/}
-                        {/*        onChange={(e, {value}) => this.setState({rsid: value})} />*/}
-                        <Button size='mini' color='blue' fluid onClick={this.addService}>Add</Button>
-                        {/*</Label>*/}
+                        <Label size='big' >
+                            <Select compact options={rooms_options} value={room} size='big'
+                                    onChange={(e, {value}) => this.setState({room: value})} />
+                            <Button size='big' color='blue' onClick={this.addService}>Add</Button>
+                        </Label>
                         <Divider /></div>
                     : null}
+
+                {services_list}
+
 
                 {!id ? null :
                     <Message className='or_buttons'>

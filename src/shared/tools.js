@@ -1,7 +1,8 @@
+import kc from "../components/UserManager";
+
 export const JSDB_STATE = process.env.REACT_APP_JSDB_STATE;
 export const JSRP_BACKEND = process.env.REACT_APP_JSRP_BACKEND;
-export const WFSRV_BACKEND = process.env.REACT_APP_WFSRV_BACKEND;
-
+export const GXY_BACKEND = process.env.REACT_APP_GXY_BACKEND;
 export const PIRATI = process.env.REACT_APP_PIRATI;
 export const TEST = process.env.REACT_APP_TEST;
 export const MERKAZ_MAIN = process.env.REACT_APP_MERKAZ_MAIN;
@@ -15,8 +16,6 @@ export const PROXY_BACKEND = process.env.REACT_APP_PROXY_BACKEND;
 export const SRV_URL = process.env.REACT_APP_SRV_URL;
 export const LIVE_URL = process.env.REACT_APP_LIVE_URL;
 export const KC_URL = process.env.REACT_APP_KC_URL;
-export const RS_STATE = process.env.REACT_APP_RS_STATE;
-export const RS_BACKEND = process.env.REACT_APP_RS_BACKEND;
 
 export const toHms = (totalSec) => {
     let d = parseInt(totalSec / (3600*24));
@@ -40,7 +39,10 @@ export const getPercent = (total,current) => {
 
 export const streamFetcher = (ip, path, data, cb) => fetch(`http://${ip}:8081/${path}`, {
     method: 'PUT',
-    headers: {'Content-Type': 'application/json'},
+    headers: {
+        'Authorization': 'bearer ' + kc.token,
+        'Content-Type': 'application/json'
+    },
     body:  JSON.stringify(data)
 })
     .then((response) => {
@@ -52,7 +54,10 @@ export const streamFetcher = (ip, path, data, cb) => fetch(`http://${ip}:8081/${
 
 export const proxyFetcher = (data, cb) => fetch(`${PROXY_BACKEND}`, {
     method: 'PUT',
-    headers: {'Content-Type': 'application/json'},
+    headers: {
+        'Authorization': 'bearer ' + kc.token,
+        'Content-Type': 'application/json'
+    },
     body:  JSON.stringify(data)
 })
     .then((response) => {
@@ -62,13 +67,25 @@ export const proxyFetcher = (data, cb) => fetch(`${PROXY_BACKEND}`, {
     })
     .catch(ex => console.log("Put Data error:", ex));
 
-export const getData = (path, cb) => fetch(`${JSDB_STATE}/${path}`)
+export const getData = (path, cb) => fetch(`${JSDB_STATE}/${path}`, {
+        headers: {'Content-Type': 'application/json'}
+    })
     .then((response) => {
         if (response.ok) {
             return response.json().then(data => cb(data));
         }
     })
     .catch(ex => console.log(`get ${path}`, ex));
+
+export const getRooms = (cb) => fetch(`${GXY_BACKEND}`, {
+    headers: {'Authorization': 'bearer ' + kc.token, 'Content-Type': 'application/json'}
+})
+    .then((response) => {
+        if (response.ok) {
+            return response.json().then(data => cb(data));
+        }
+    })
+    .catch(ex => console.log(`get rooms`, ex));
 
 export const getStreamUrl = (lang, cb) => {
     const qv = lang.match(/^(heb|rus|eng|fre|spa|ita|ger)$/) ? "hd" : "high";
@@ -84,7 +101,9 @@ export const getStreamUrl = (lang, cb) => {
         .catch(ex => console.log(`get ${lang}`, ex));
 };
 
-export const getService = (path, cb) => fetch(`${SRV_URL}/${path}`)
+export const getService = (path, cb) => fetch(`${SRV_URL}/${path}`, {
+        headers: {'Authorization': 'bearer ' + kc.token, 'Content-Type': 'application/json'}
+    })
     .then((response) => {
         if (response.ok) {
             return response.json().then(data => cb(data));
@@ -92,7 +111,9 @@ export const getService = (path, cb) => fetch(`${SRV_URL}/${path}`)
     })
     .catch(ex => console.log(`get ${path}`, ex));
 
-export const getWorkflowData = (path, cb) => fetch(`${JSRP_BACKEND}/${path}`)
+export const getWorkflowData = (path, cb) => fetch(`${JSRP_BACKEND}/${path}`, {
+        headers: {'Authorization': 'bearer ' + kc.token, 'Content-Type': 'application/json'}
+    })
     .then((response) => {
         if (response.ok) {
             return response.json().then(data => cb(data));
@@ -226,47 +247,3 @@ export const id_options = [
     { key: 'yt', text: 'YouTube', value: 'yt' },
     { key: 'fb', text: 'Facebook', value: 'fb' },
 ];
-
-export const getRstrData = (cb) => fetch(`${RS_STATE}`)
-    .then((response) => {
-        if (response.ok) {
-            return response.json().then(data => cb(data));
-        }
-    })
-    .catch(ex => console.log(`getData`, ex));
-
-export const putRstrData = (data, cb) => fetch(`${RS_STATE}`, {
-    method: 'PUT',
-    headers: {'Content-Type': 'application/json'},
-    body:  JSON.stringify(data)
-})
-    .then((response) => {
-        if (response.ok) {
-            return response.json().then(respond => cb(respond));
-        }
-    })
-    .catch(ex => console.log("Put Data error:", ex));
-
-export const rstrExec = (data, cb) => fetch(`${RS_BACKEND}/exec`, {
-    method: 'PUT',
-    headers: {'Content-Type': 'application/json'},
-    body:  JSON.stringify(data)
-})
-    .then((response) => {
-        if (response.ok) {
-            return response.json().then(respond => cb(respond));
-        }
-    })
-    .catch(ex => console.log("Put Data error:", ex));
-
-export const rstrStatus = (id,cb) => {
-    fetch(`${RS_BACKEND}/status?id=${id}`)
-        .then((response) => {
-            if (response.ok) {
-                return response.json().then(data => cb(data));
-            } else {
-                cb(null)
-            }
-        })
-        .catch(ex => console.log(`getStatus`, ex));
-};
