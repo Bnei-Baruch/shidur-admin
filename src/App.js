@@ -103,13 +103,13 @@ class App extends Component {
           //                   id={decoder_id}
           //                   decoders={decoders} />
           //     </Tab.Pane> },
-          // { menuItem: { key: 'capture', icon: 'film', content: 'Captures', disabled: !shidur_root },
-          //     render: () => <Tab.Pane attached={false} >
-          //         <Captures jsonState={this.setJsonState}
-          //                   idState={this.setIdState}
-          //                   id={capture_id}
-          //                   captures={captures} />
-          //     </Tab.Pane> },
+          { menuItem: { key: 'capture', icon: 'film', content: 'Captures', disabled: !shidur_root },
+              render: () => <Tab.Pane attached={false} >
+                  <Captures jsonState={this.setJsonState}
+                            idState={this.setIdState}
+                            id={capture_id}
+                            captures={captures} />
+              </Tab.Pane> },
           // { menuItem: { key: 'workflow', icon: 'hdd', content: 'Workflow', disabled: !shidur_root },
           //     render: () => <Tab.Pane attached={false} >
           //         <Workflow jsonState={this.setJsonState}
