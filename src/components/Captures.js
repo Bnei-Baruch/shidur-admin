@@ -1,17 +1,5 @@
 import React, {Component} from 'react'
-import {
-    Checkbox,
-    Divider,
-    Segment,
-    Label,
-    Dropdown,
-    Message,
-    Button,
-    List,
-    Table,
-    Select,
-    Menu
-} from 'semantic-ui-react'
+import {Checkbox, Divider, Segment, Label, Dropdown, Message, Button, List, Table, Menu} from 'semantic-ui-react'
 import {getService, putData, toHms} from "../shared/tools";
 import Service from "./Service";
 
@@ -19,15 +7,14 @@ import Service from "./Service";
 class Captures extends Component {
 
     state = {
-        auto: false,
         capture: {},
         id: "",
+        room: {"room":1051,"janus":"gxy8","description":"Test Room","questions":false,"num_users":0,"users":null,"region":"","extra":null},
+        rooms: [{"room":1051,"janus":"gxy8","description":"Test Room","questions":false,"num_users":0,"users":null,"region":"","extra":null}],
         ival: null,
-        sval: null,
-        status: "",
-        captimer: "00:00:00",
-        stat: {cpu: "", hdd: "", temp: ""},
         services: [],
+        status: "",
+        stat: {cpu: "", hdd: "", temp: ""}
     };
 
     componentDidMount() {
@@ -38,7 +25,6 @@ class Captures extends Component {
 
     componentWillUnmount() {
         clearInterval(this.state.ival);
-        clearInterval(this.state.sval);
     };
 
     setCapture = (id, capture) => {
