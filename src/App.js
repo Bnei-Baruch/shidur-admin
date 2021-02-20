@@ -3,6 +3,7 @@ import { Container, Tab } from 'semantic-ui-react'
 import 'semantic-ui-css/semantic.min.css';
 import './App.css';
 import LoginPage from './components/LoginPage';
+import mqtt from "./shared/mqtt";
 import {kc} from "./components/UserManager";
 import {getData, putData} from "./shared/tools";
 import Restreamer from "./components/Restreamer";
@@ -44,6 +45,16 @@ class App extends Component {
                 console.log(":: Got streamer: ",streamer);
                 const {encoders,decoders,captures,playouts,workflows,restream} = streamer;
                 this.setState({encoders,decoders,captures,playouts,workflows,restream});
+                mqtt.init(user, (data) => {
+                    console.log("[mqtt] init: ", data);
+                    const watch = 'exec/service/data/#';
+                    const local = window.location.hostname !== "shidur.kli.one";
+                    const topic = local ? watch : 'bb/' + watch;
+                    mqtt.join(topic);
+                    mqtt.watch((message) => {
+                        //this.handleCmdData(message);
+                    })
+                })
             });
         } else {
             alert("Access denied!");

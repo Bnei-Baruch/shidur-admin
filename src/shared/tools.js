@@ -16,6 +16,8 @@ export const PROXY_BACKEND = process.env.REACT_APP_PROXY_BACKEND;
 export const SRV_URL = process.env.REACT_APP_SRV_URL;
 export const LIVE_URL = process.env.REACT_APP_LIVE_URL;
 export const KC_URL = process.env.REACT_APP_KC_URL;
+export const MQTT_LCL_URL = process.env.REACT_APP_MQTT_LCL_URL;
+export const MQTT_EXT_URL = process.env.REACT_APP_MQTT_EXT_URL;
 
 export const toHms = (totalSec) => {
     let d = parseInt(totalSec / (3600*24));
