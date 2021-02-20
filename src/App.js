@@ -117,13 +117,13 @@ class App extends Component {
           //                   id={workflow_id}
           //                   workflows={workflows} />
           //     </Tab.Pane> },
-          { menuItem: { key: 'playout', icon: 'play', content: 'Playout', disabled: !shidur_root },
-              render: () => <Tab.Pane attached={false} >
-                  <Playouts jsonState={this.setJsonState}
-                            idState={this.setIdState}
-                            id={playout_id}
-                            playouts={playouts} />
-              </Tab.Pane> },
+          // { menuItem: { key: 'playout', icon: 'play', content: 'Playout', disabled: !shidur_root },
+          //     render: () => <Tab.Pane attached={false} >
+          //         <Playouts jsonState={this.setJsonState}
+          //                   idState={this.setIdState}
+          //                   id={playout_id}
+          //                   playouts={playouts} />
+          //     </Tab.Pane> },
           { menuItem: { key: 'webrtc', icon: 'globe', content: 'WebRTC', disabled: !shidur_root },
               render: () => <Tab.Pane attached={false} >
                   <WebRTC />
