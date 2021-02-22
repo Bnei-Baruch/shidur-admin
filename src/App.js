@@ -52,7 +52,7 @@ class App extends Component {
                     const topic = local ? watch : 'bb/' + watch;
                     mqtt.join(topic);
                     mqtt.watch((message, topic) => {
-                        this.cap.onMqttMessage(message, topic);
+                        this.cap?.onMqttMessage(message, topic);
                     }, false)
                 })
             });
