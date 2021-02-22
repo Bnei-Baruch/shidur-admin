@@ -2,6 +2,7 @@ import React, {Component} from 'react'
 import {Checkbox, Divider, Segment, Label, Dropdown, Message, Button, List, Table, Menu} from 'semantic-ui-react'
 import {getService, putData, toHms} from "../shared/tools";
 import Service from "./Service";
+import mqtt from "../shared/mqtt";
 
 
 class Captures extends Component {
@@ -18,13 +19,29 @@ class Captures extends Component {
     };
 
     componentDidMount() {
+        this.props.onRef(this)
         const {id,captures} = this.props;
         if(id)
             this.setCapture(id, captures[id]);
     };
 
     componentWillUnmount() {
+        this.props.onRef(undefined)
         clearInterval(this.state.ival);
+    };
+
+    onMqttMessage = (message, topic) => {
+        let services = message.data;
+        if(services) {
+            for(let i=0; i<services.length; i++) {
+                //services[i].out_time = services[i].log.split('time=')[1].split('.')[0];
+                services[i].out_time = toHms(services[i].runtime);
+            }
+            //console.debug("[capture] Message: ", services);
+            this.setState({services});
+        // } else {
+        //     this.setState({services: []});
+        }
     };
 
     setCapture = (id, capture) => {
@@ -78,12 +95,14 @@ class Captures extends Component {
 
     startEncoder = () => {
         let {id} = this.state;
-        getService(id + "/start", () => {})
+        //getService(id + "/start", () => {})
+        mqtt.send("start", false, "exec/service/" + id);
     };
 
     stopEncoder = () => {
         let {id} = this.state;
-        getService(id + "/stop", () => {})
+        //getService(id + "/stop", () => {})
+        mqtt.send("stop", false, "exec/service/" + id);
     };
 
     runTimer = () => {
@@ -98,17 +117,18 @@ class Captures extends Component {
 
     getStat = () => {
         const {id} = this.state;
-        getService(id + "/status", (services) => {
-            if(services) {
-                for(let i=0; i<services.length; i++) {
-                    //services[i].out_time = services[i].log.split('time=')[1].split('.')[0];
-                    services[i].out_time = toHms(services[i].runtime);
-                }
-                this.setState({services});
-            } else {
-                this.setState({services: []});
-            }
-        })
+        mqtt.send("status", false, "exec/service/" + id);
+        // getService(id + "/status", (services) => {
+        //     if(services) {
+        //         for(let i=0; i<services.length; i++) {
+        //             //services[i].out_time = services[i].log.split('time=')[1].split('.')[0];
+        //             services[i].out_time = toHms(services[i].runtime);
+        //         }
+        //         this.setState({services});
+        //     } else {
+        //         this.setState({services: []});
+        //     }
+        // })
     };
 
     render() {

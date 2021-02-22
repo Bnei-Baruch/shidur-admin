@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
 import { Message, Menu, Checkbox, Label, Icon, Popup, Modal, Button, Input, Header } from 'semantic-ui-react'
 import {getService} from "../shared/tools";
+import mqtt from "../shared/mqtt";
 
 class Service extends Component {
 
@@ -31,8 +32,17 @@ class Service extends Component {
         let online = service.alive;
         this.setState({online});
         this.setDelay();
-        if(online) getService(id + "/stop/" + service.id, () => {})
-        if(!online) getService(id + "/start/" + service.id, () => {})
+        if(id === "auto-backup") {
+            if(online) mqtt.send("stop", false, "exec/service/"+id+"/"+service.id);
+        } else {
+            if(online) getService(id + "/stop/" + service.id, () => {})
+        }
+
+        if(id === "auto-backup") {
+            if(!online) mqtt.send("start", false, "exec/service/"+id+"/"+service.id);
+        } else {
+            if(!online) getService(id + "/start/" + service.id, () => {})
+        }
     };
 
     addNote = () => {

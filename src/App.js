@@ -51,9 +51,9 @@ class App extends Component {
                     const local = window.location.hostname !== "shidur.kli.one";
                     const topic = local ? watch : 'bb/' + watch;
                     mqtt.join(topic);
-                    mqtt.watch((message) => {
-                        //this.handleCmdData(message);
-                    })
+                    mqtt.watch((message, topic) => {
+                        this.cap.onMqttMessage(message, topic);
+                    }, false)
                 })
             });
         } else {
@@ -119,7 +119,7 @@ class App extends Component {
                   <Captures jsonState={this.setJsonState}
                             idState={this.setIdState}
                             id={capture_id}
-                            captures={captures} />
+                            captures={captures} onRef={ref => (this.cap = ref)} />
               </Tab.Pane> },
           // { menuItem: { key: 'workflow', icon: 'hdd', content: 'Workflow', disabled: !shidur_root },
           //     render: () => <Tab.Pane attached={false} >

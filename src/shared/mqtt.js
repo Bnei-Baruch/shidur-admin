@@ -48,7 +48,7 @@ class MqttMsg {
     }
 
     join = (topic) => {
-        console.log("[mqtt] Subscribe to: ", topic)
+        console.debug("[mqtt] Subscribe to: ", topic)
         let options = {qos: 1, nl: true}
         this.mq.subscribe(topic, {...options}, (err) => {
             err && console.error('[mqtt] Error: ', err);
@@ -57,15 +57,15 @@ class MqttMsg {
 
     exit = (topic) => {
         let options = {}
-        console.log("[mqtt] Unsubscribe from: ", topic)
+        console.debug("[mqtt] Unsubscribe from: ", topic)
         this.mq.unsubscribe(topic, {...options} ,(err) => {
             err && console.error('[mqtt] Error: ',err);
         })
     }
 
     send = (message, retain, topic) => {
-        console.log("[mqtt] Send data on topic: ", topic, message)
-        let options = {qos: 1, retain, properties: {messageExpiryInterval: 0, userProperties: this.user}};
+        //console.debug("[mqtt] Send data on topic: ", topic, message)
+        let options = {qos: 1, retain};
         this.mq.publish(topic, message, {...options}, (err) => {
             err && console.error('[mqtt] Error: ',err);
         })
@@ -74,7 +74,7 @@ class MqttMsg {
     watch = (callback, stat) => {
         this.mq.on('message',  (topic, data, packet) => {
             let message = stat ? data.toString() : JSON.parse(data.toString());
-            console.log("[mqtt] Got data on topic: ", topic, message);
+            //console.debug("[mqtt] Got data on topic: ", topic);
             callback(message, topic)
         })
     }
