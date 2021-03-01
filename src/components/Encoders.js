@@ -2,6 +2,7 @@ import React, {Component} from 'react'
 import {Divider, Table, Segment, Label, Dropdown, Message, Button, List, Menu, Checkbox, Select} from 'semantic-ui-react'
 import {getService, toHms, putData, getRooms} from "../shared/tools";
 import Service from "./Service";
+import mqtt from "../shared/mqtt";
 
 
 class Encoders extends Component {
@@ -18,12 +19,29 @@ class Encoders extends Component {
     };
 
     componentDidMount() {
+        this.props.onRef(this)
         const {id,encoders} = this.props;
         if(id) this.setEncoder(id, encoders[id]);
     };
 
     componentWillUnmount() {
+        this.props.onRef(undefined)
         clearInterval(this.state.ival);
+    };
+
+    onMqttMessage = (message, topic) => {
+        console.debug("[encoders] Message: ", message);
+        let services = message.data;
+        if(services) {
+            for(let i=0; i<services.length; i++) {
+                //services[i].out_time = services[i].log.split('time=')[1].split('.')[0];
+                services[i].out_time = toHms(services[i].runtime);
+            }
+            //console.debug("[capture] Message: ", services);
+            this.setState({services});
+            // } else {
+            //     this.setState({services: []});
+        }
     };
 
     setEncoder = (id, encoder) => {
@@ -103,17 +121,18 @@ class Encoders extends Component {
 
     getStat = () => {
         const {id} = this.state;
-        getService(id + "/status", (services) => {
-            if(services) {
-                for(let i=0; i<services.length; i++) {
-                    //services[i].out_time = services[i].log.split('time=')[1].split('.')[0];
-                    services[i].out_time = toHms(services[i].runtime);
-                }
-                this.setState({services});
-            } else {
-                this.setState({services: []});
-            }
-        })
+        mqtt.send("status", false, "exec/service/" + id);
+        // getService(id + "/status", (services) => {
+        //     if(services) {
+        //         for(let i=0; i<services.length; i++) {
+        //             //services[i].out_time = services[i].log.split('time=')[1].split('.')[0];
+        //             services[i].out_time = toHms(services[i].runtime);
+        //         }
+        //         this.setState({services});
+        //     } else {
+        //         this.setState({services: []});
+        //     }
+        // })
     };
 
     render() {
