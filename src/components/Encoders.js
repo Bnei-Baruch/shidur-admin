@@ -30,9 +30,10 @@ class Encoders extends Component {
     };
 
     onMqttMessage = (message, topic) => {
-        console.debug("[encoders] Message: ", message);
+        //console.debug("[encoders] Message: ", message);
         let services = message.data;
-        if(services) {
+        const src = topic.split("/")[3]
+        if(services && this.state.id === src) {
             for(let i=0; i<services.length; i++) {
                 //services[i].out_time = services[i].log.split('time=')[1].split('.')[0];
                 services[i].out_time = toHms(services[i].runtime);
