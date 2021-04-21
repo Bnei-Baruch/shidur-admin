@@ -32,7 +32,8 @@ class Captures extends Component {
 
     onMqttMessage = (message, topic) => {
         let services = message.data;
-        const src = topic.split("/")[3]
+        const local = window.location.hostname !== "shidur.kli.one";
+        const src = local ? topic.split("/")[3] : topic.split("/")[4];
         if(this.state.id)
         if(services && this.state.id === src) {
             for(let i=0; i<services.length; i++) {
