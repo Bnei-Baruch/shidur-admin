@@ -149,6 +149,7 @@ class Encoders extends Component {
         let enc_options = Object.keys(encoders).map((id, i) => {
             let encoder = encoders[id];
             const {name , description} = encoder;
+            if(name !== "Galaxy-Test" && this.props.shidur_galaxy) return null
             return (
                 <Dropdown.Item
                     key={i}

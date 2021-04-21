@@ -33,13 +33,15 @@ class App extends Component {
         restream_id: null,
         shidur_admin: false,
         shidur_root: false,
+        shidur_galaxy: false,
         user: null,
     };
 
     checkPermission = (user) => {
         const shidur_admin = kc.hasRealmRole("shidur_admin");
         const shidur_root = kc.hasRealmRole("shidur_root");
-        if(shidur_root || shidur_admin) {
+        const shidur_galaxy = kc.hasRealmRole("shidur_galaxy");
+        if(shidur_root || shidur_admin || shidur_galaxy) {
             this.setState({user, shidur_admin, shidur_root});
             getData(`streamer`, (streamer) => {
                 console.log(":: Got streamer: ",streamer);
@@ -86,7 +88,7 @@ class App extends Component {
 
   render() {
 
-      const {user,shidur_admin,shidur_root,encoders,decoders,captures,playouts,workflows,restream,encoder_id,decoder_id,capture_id,playout_id,workflow_id,restream_id} = this.state;
+      const {user,shidur_admin,shidur_root,shidur_galaxy,encoders,decoders,captures,playouts,workflows,restream,encoder_id,decoder_id,capture_id,playout_id,workflow_id,restream_id} = this.state;
 
       let login = (<LoginPage user={user} checkPermission={this.checkPermission} />);
 
@@ -100,11 +102,11 @@ class App extends Component {
                             id={restream_id}
                             restream={restream} />
               </Tab.Pane> },
-          { menuItem: { key: 'encoder', icon: 'photo', content: 'Encoders', disabled: !shidur_root },
+          { menuItem: { key: 'encoder', icon: 'photo', content: 'Encoders', disabled: !(shidur_galaxy || shidur_root) },
               render: () => <Tab.Pane attached={false} >
                   <Encoders jsonState={this.setJsonState}
                             idState={this.setIdState}
-                            id={encoder_id}
+                            id={encoder_id} shidur_galaxy={shidur_galaxy}
                             encoders={encoders} onRef={ref => (this.cap = ref)} />
               </Tab.Pane> },
           // { menuItem: { key: 'decoder', icon: 'record', content: 'Decoders', disabled: !shidur_root },
