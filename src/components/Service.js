@@ -33,20 +33,20 @@ class Service extends Component {
         this.setState({online});
         this.setDelay();
 
-        if(online) mqtt.send("stop", false, "exec/service/"+id+"/"+service.id);
-        if(!online) mqtt.send("start", false, "exec/service/"+id+"/"+service.id);
+        // if(online) mqtt.send("stop", false, "exec/service/"+id+"/"+service.id);
+        // if(!online) mqtt.send("start", false, "exec/service/"+id+"/"+service.id);
 
-        // if(id === "auto-backup") {
-        //     if(online) mqtt.send("stop", false, "exec/service/"+id+"/"+service.id);
-        // } else {
-        //     if(online) getService(id + "/stop/" + service.id, () => {})
-        // }
-        //
-        // if(id === "auto-backup") {
-        //     if(!online) mqtt.send("start", false, "exec/service/"+id+"/"+service.id);
-        // } else {
-        //     if(!online) getService(id + "/start/" + service.id, () => {})
-        // }
+        if(id !== "galaxy-test") {
+            if(online) mqtt.send("stop", false, "exec/service/"+id+"/"+service.id);
+        } else {
+            if(online) getService(id + "/stop/" + service.id, () => {})
+        }
+
+        if(id !== "galaxy-test") {
+            if(!online) mqtt.send("start", false, "exec/service/"+id+"/"+service.id);
+        } else {
+            if(!online) getService(id + "/start/" + service.id, () => {})
+        }
     };
 
     addNote = () => {

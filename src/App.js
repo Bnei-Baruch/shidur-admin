@@ -14,6 +14,7 @@ import Playouts from "./components/Playouts";
 import Settings from "./components/Settings";
 import Workflow from "./components/Workflow";
 import WebRTC from "./components/WebRTC";
+import Galaxy from "./components/Galaxy";
 //import UDP from "./components/UDP";
 
 class App extends Component {
@@ -42,7 +43,7 @@ class App extends Component {
         const shidur_root = kc.hasRealmRole("shidur_root");
         const shidur_galaxy = kc.hasRealmRole("shidur_galaxy");
         if(shidur_root || shidur_admin || shidur_galaxy) {
-            this.setState({user, shidur_admin, shidur_root});
+            this.setState({user, shidur_admin, shidur_root, shidur_galaxy});
             getData(`streamer`, (streamer) => {
                 console.log(":: Got streamer: ",streamer);
                 const {encoders,decoders,captures,playouts,workflows,restream} = streamer;
@@ -102,7 +103,14 @@ class App extends Component {
                             id={restream_id}
                             restream={restream} />
               </Tab.Pane> },
-          { menuItem: { key: 'encoder', icon: 'photo', content: 'Encoders', disabled: !(shidur_galaxy || shidur_root) },
+          { menuItem: { key: 'galaxy', icon: 'users', content: 'Galaxy', disabled: !shidur_galaxy },
+              render: () => <Tab.Pane attached={false} >
+                  <Galaxy jsonState={this.setJsonState}
+                          idState={this.setIdState}
+                          id={encoder_id} shidur_galaxy={shidur_galaxy}
+                          encoders={encoders} onRef={ref => (this.cap = ref)} />
+              </Tab.Pane> },
+          { menuItem: { key: 'encoder', icon: 'photo', content: 'Encoders', disabled: !shidur_root },
               render: () => <Tab.Pane attached={false} >
                   <Encoders jsonState={this.setJsonState}
                             idState={this.setIdState}

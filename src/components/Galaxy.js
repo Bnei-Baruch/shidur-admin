@@ -5,11 +5,11 @@ import Service from "./Service";
 import mqtt from "../shared/mqtt";
 
 
-class Encoders extends Component {
+class Galaxy extends Component {
 
     state = {
         encoder: {},
-        id: "",
+        id: "galaxy-test",
         room: {"room":1051,"janus":"gxy8","description":"Test Room","questions":false,"num_users":0,"users":null,"region":"","extra":null},
         rooms: [{"room":1051,"janus":"gxy8","description":"Test Room","questions":false,"num_users":0,"users":null,"region":"","extra":null}],
         ival: null,
@@ -20,10 +20,9 @@ class Encoders extends Component {
 
     componentDidMount() {
         this.props.onRef(this)
-        const {id,encoders} = this.props;
-        if(id && id !== "galaxy-test") {
-            this.setEncoder(id, encoders[id]);
-        };
+        const {encoders} = this.props;
+        const id = "galaxy-test";
+        this.setEncoder(id, encoders[id]);
     };
 
     componentWillUnmount() {
@@ -32,19 +31,20 @@ class Encoders extends Component {
     };
 
     onMqttMessage = (message, topic) => {
+        return
         //console.debug("[encoders] Message: ", message);
         let services = message.data;
         const local = window.location.hostname !== "shidur.kli.one";
         const src = local ? topic.split("/")[3] : topic.split("/")[4];
-        if(services && this.state.id === src) {
+        if(services) {
             for(let i=0; i<services.length; i++) {
-                //services[i].out_time = services[i].log.split('time=')[1].split('.')[0];
+                // services[i].out_time = services[i].log.split('time=')[1].split('.')[0];
                 services[i].out_time = toHms(services[i].runtime);
             }
             //console.debug("[capture] Message: ", services);
             this.setState({services});
-            // } else {
-            //     this.setState({services: []});
+            } else {
+                this.setState({services: []});
         }
     };
 
@@ -125,18 +125,18 @@ class Encoders extends Component {
 
     getStat = () => {
         const {id} = this.state;
-        mqtt.send("status", false, "exec/service/" + id);
-        // getService(id + "/status", (services) => {
-        //     if(services) {
-        //         for(let i=0; i<services.length; i++) {
-        //             //services[i].out_time = services[i].log.split('time=')[1].split('.')[0];
-        //             services[i].out_time = toHms(services[i].runtime);
-        //         }
-        //         this.setState({services});
-        //     } else {
-        //         this.setState({services: []});
-        //     }
-        // })
+        //mqtt.send("status", false, "exec/service/" + id);
+        getService(id + "/status", (services) => {
+            if(services) {
+                for(let i=0; i<services.length; i++) {
+                    //services[i].out_time = services[i].log.split('time=')[1].split('.')[0];
+                    services[i].out_time = toHms(services[i].runtime);
+                }
+                this.setState({services});
+            } else {
+                this.setState({services: []});
+            }
+        })
     };
 
     render() {
@@ -151,7 +151,7 @@ class Encoders extends Component {
         let enc_options = Object.keys(encoders).map((id, i) => {
             let encoder = encoders[id];
             const {name , description} = encoder;
-            if(name === "Galaxy-Test") return null
+            if(name !== "Galaxy-Test" && this.props.shidur_galaxy) return null
             return (
                 <Dropdown.Item
                     key={i}
@@ -263,4 +263,4 @@ class Encoders extends Component {
     }
 }
 
-export default Encoders;
+export default Galaxy;
