@@ -36,16 +36,16 @@ class Service extends Component {
         // if(online) mqtt.send("stop", false, "exec/service/"+id+"/"+service.id);
         // if(!online) mqtt.send("start", false, "exec/service/"+id+"/"+service.id);
 
-        if(id !== "galaxy-test") {
-            if(online) mqtt.send("stop", false, "exec/service/"+id+"/"+service.id);
+        if(id.match(/^(galaxy-test|live-proxy)$/)) {
+            if(online) getService(id + "/stop/" + service.id, () => {});
         } else {
-            if(online) getService(id + "/stop/" + service.id, () => {})
+            if(online) mqtt.send("stop", false, "exec/service/"+id+"/"+service.id);
         }
 
-        if(id !== "galaxy-test") {
-            if(!online) mqtt.send("start", false, "exec/service/"+id+"/"+service.id);
+        if(id.match(/^(galaxy-test|live-proxy)$/)) {
+            if(!online) getService(id + "/start/" + service.id, () => {});
         } else {
-            if(!online) getService(id + "/start/" + service.id, () => {})
+            if(!online) mqtt.send("start", false, "exec/service/"+id+"/"+service.id);
         }
     };
 
