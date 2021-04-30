@@ -55,7 +55,7 @@ class Restreamer extends Component {
         const {id} = this.state;
         restream[id].services[i].description = description;
         getStreamUrl(this.state.language, url => {
-            let cmd = `-progress stat_${id}.log -hide_banner -re -i ${url} -c copy -bsf:a aac_adtstoasc -f flv ${description}`
+            let cmd = `-progress stat_${id}.log -hide_banner -re -i ${url} -c:v copy -c:a libfdk_aac -b:a 64k -f flv ${description}`
             let arg = cmd.split(" ");
             restream[id].services[i].args = arg;
             this.saveData(restream[id])
