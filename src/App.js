@@ -51,7 +51,7 @@ class App extends Component {
                 mqtt.init(user, (data) => {
                     console.log("[mqtt] init: ", data);
                     const watch = 'exec/service/data/#';
-                    const local = window.location.hostname !== "shidur.kli.one";
+                    const local = window.location.hostname === "shidur.bbdomain.org";
                     const topic = local ? watch : 'bb/' + watch;
                     mqtt.join(topic);
                     mqtt.watch((message, topic) => {

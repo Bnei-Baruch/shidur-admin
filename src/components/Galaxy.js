@@ -34,7 +34,7 @@ class Galaxy extends Component {
         return
         //console.debug("[encoders] Message: ", message);
         let services = message.data;
-        const local = window.location.hostname !== "shidur.kli.one";
+        const local = window.location.hostname === "shidur.bbdomain.org";
         const src = local ? topic.split("/")[3] : topic.split("/")[4];
         if(services) {
             for(let i=0; i<services.length; i++) {
