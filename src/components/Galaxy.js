@@ -10,8 +10,8 @@ class Galaxy extends Component {
     state = {
         encoder: {},
         id: "galaxy-test",
-        room: {"room":1051,"janus":"gxy8","description":"Test Room","questions":false,"num_users":0,"users":null,"region":"","extra":null},
-        rooms: [{"room":1051,"janus":"gxy8","description":"Test Room","questions":false,"num_users":0,"users":null,"region":"","extra":null}],
+        room: {"room":1051,"janus":"gxy9","description":"Test Room","questions":false,"num_users":0,"users":null,"region":"","extra":null},
+        rooms: [{"room":1051,"janus":"gxy9","description":"Test Room","questions":false,"num_users":0,"users":null,"region":"","extra":null}],
         ival: null,
         services: [],
         status: "",
@@ -52,7 +52,7 @@ class Galaxy extends Component {
         console.log(":: Set encoder: ",encoder);
         if(id === "galaxy-test") {
             getRooms(data => {
-                let rooms = data.rooms.filter(r => r.janus === "gxy8");
+                let rooms = data.rooms.filter(r => r.janus === "gxy9");
                 this.setState({rooms})
             });
         }
@@ -70,7 +70,7 @@ class Galaxy extends Component {
         }
         const id = "janus-" + (encoder.services.length + 1).toString();
         const description = room.description;
-        const cmd = `janus.py --play-from video.mp4 --room ${room.room} https://gxy8.kli.one/janusgxy`;
+        const cmd = `janus.py --play-from video.mp4 --room ${room.room} https://gxy9.kli.one/janusgxy`;
         const args = cmd.split(" ");
         encoder.services.push({description, id, name: "python3", args});
         this.saveData(encoder)
