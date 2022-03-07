@@ -1,7 +1,8 @@
 import React, {Component} from 'react'
 import {Divider, Segment, Label, Button, Select} from 'semantic-ui-react'
-import {getService, getStreamUrl, id_options, putData, rstr_options, toHms} from "../shared/tools";
+import {getRooms, getService, getStreamUrl, id_options, putData, rstr_options, toHms} from "../shared/tools";
 import Service from "./Service";
+import mqtt from "../shared/mqtt";
 
 class Restreamer extends Component {
 
@@ -23,11 +24,26 @@ class Restreamer extends Component {
     };
 
     componentDidMount() {
+        this.props.onRef(this)
         this.runTimer();
     };
 
     componentWillUnmount() {
+        this.props.onRef(undefined)
         clearInterval(this.state.ival);
+    };
+
+    onMqttMessage = (message, topic) => {
+        //console.debug("[live-proxy] Message: ", message);
+        let services = message.data;
+        const local = true
+        const src = local ? topic.split("/")[3] : topic.split("/")[4];
+        if(services && this.state.id === src) {
+            for(let i=0; i<services.length; i++) {
+                services[i].out_time = toHms(services[i].runtime);
+            }
+            this.setState({services});
+        }
     };
 
     addRestream = () => {
@@ -84,23 +100,13 @@ class Restreamer extends Component {
             clearInterval(this.state.ival);
         let ival = setInterval(() => {
             this.getStat();
-        }, 1000);
+        }, 10000);
         this.setState({ival});
     };
 
     getStat = () => {
         const {id} = this.state;
-        getService(id + "/status", (services) => {
-            if(services) {
-                for(let i=0; i<services.length; i++) {
-                    //services[i].out_time = services[i].log.split('time=')[1].split('.')[0];
-                    services[i].out_time = toHms(services[i].runtime);
-                }
-                this.setState({services});
-            } else {
-                this.setState({services: []});
-            }
-        })
+        mqtt.send("status", false, "exec/service/" + id);
     };
 
     render() {

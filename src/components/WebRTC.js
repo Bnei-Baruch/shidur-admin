@@ -2,11 +2,13 @@ import React, {Component, Fragment} from 'react'
 import {Tab, Table, Icon, Button, Modal, Header, Input, Menu, Checkbox} from 'semantic-ui-react'
 import {getData, getService, proxyFetcher, putData, removeData, toHms} from "../shared/tools";
 import Service from "./Service";
+import mqtt from "../shared/mqtt";
 
 
 class WebRTC extends Component {
 
     state = {
+        id: "udp-proxy",
         services: [],
         conf: {},
         sadna: {},
@@ -22,12 +24,14 @@ class WebRTC extends Component {
     };
 
     componentDidMount() {
+        this.props.onRef(this)
         //this.statusProxy();
         this.getConf();
         this.runTimer()
     };
 
     componentWillUnmount() {
+        this.props.onRef(undefined)
         clearInterval(this.state.ival);
     };
 
@@ -118,13 +122,27 @@ class WebRTC extends Component {
     };
 
     getStat = () => {
-        getService("udp-proxy/status", (services) => {
+        mqtt.send("status", false, "exec/service/udp-proxy");
+        // getService("udp-proxy/status", (services) => {
+        //     for(let i=0; i<services.length; i++) {
+        //         //services[i].out_time = services[i].log.split('time=')[1].split('.')[0];
+        //         services[i].out_time = toHms(services[i].runtime);
+        //     }
+        //     this.setState({services});
+        // })
+    };
+
+    onMqttMessage = (message, topic) => {
+        //console.debug("[encoders] Message: ", message);
+        let services = message.data;
+        const local = true
+        const src = local ? topic.split("/")[3] : topic.split("/")[4];
+        if(services && this.state.id === src) {
             for(let i=0; i<services.length; i++) {
-                //services[i].out_time = services[i].log.split('time=')[1].split('.')[0];
                 services[i].out_time = toHms(services[i].runtime);
             }
             this.setState({services});
-        })
+        }
     };
 
     renderContent = () => {

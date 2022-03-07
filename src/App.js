@@ -101,7 +101,7 @@ class App extends Component {
                   <Restreamer jsonState={this.setJsonState}
                             idState={this.setIdState}
                             id={restream_id}
-                            restream={restream} />
+                            restream={restream} onRef={ref => (this.cap = ref)} />
               </Tab.Pane> },
           { menuItem: { key: 'galaxy', icon: 'users', content: 'Galaxy', disabled: !shidur_galaxy },
               render: () => <Tab.Pane attached={false} >
@@ -147,7 +147,7 @@ class App extends Component {
           //     </Tab.Pane> },
           { menuItem: { key: 'webrtc', icon: 'globe', content: 'WebRTC', disabled: !shidur_root },
               render: () => <Tab.Pane attached={false} >
-                  <WebRTC />
+                  <WebRTC onRef={ref => (this.cap = ref)} />
               </Tab.Pane> },
           { menuItem: { key: 'settings', icon: 'settings', content: 'Settings', disabled: !shidur_root },
               render: () => <Tab.Pane attached={false} >
