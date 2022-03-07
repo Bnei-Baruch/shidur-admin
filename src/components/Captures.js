@@ -32,7 +32,7 @@ class Captures extends Component {
 
     onMqttMessage = (message, topic) => {
         let services = message.data;
-        const local = window.location.hostname === "shidur.bbdomain.org";
+        const local = true
         const src = local ? topic.split("/")[3] : topic.split("/")[4];
         if(this.state.id)
         if(services && this.state.id === src) {

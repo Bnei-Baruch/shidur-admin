@@ -34,7 +34,7 @@ class Encoders extends Component {
     onMqttMessage = (message, topic) => {
         //console.debug("[encoders] Message: ", message);
         let services = message.data;
-        const local = window.location.hostname === "shidur.bbdomain.org";
+        const local = true
         const src = local ? topic.split("/")[3] : topic.split("/")[4];
         if(services && this.state.id === src) {
             for(let i=0; i<services.length; i++) {
