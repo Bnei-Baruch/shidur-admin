@@ -31,20 +31,15 @@ class Galaxy extends Component {
     };
 
     onMqttMessage = (message, topic) => {
-        return
         //console.debug("[encoders] Message: ", message);
         let services = message.data;
         const local = true
         const src = local ? topic.split("/")[3] : topic.split("/")[4];
-        if(services) {
+        if(services && this.state.id === src) {
             for(let i=0; i<services.length; i++) {
-                // services[i].out_time = services[i].log.split('time=')[1].split('.')[0];
                 services[i].out_time = toHms(services[i].runtime);
             }
-            //console.debug("[capture] Message: ", services);
             this.setState({services});
-            } else {
-                this.setState({services: []});
         }
     };
 
@@ -125,18 +120,7 @@ class Galaxy extends Component {
 
     getStat = () => {
         const {id} = this.state;
-        //mqtt.send("status", false, "exec/service/" + id);
-        getService(id + "/status", (services) => {
-            if(services) {
-                for(let i=0; i<services.length; i++) {
-                    //services[i].out_time = services[i].log.split('time=')[1].split('.')[0];
-                    services[i].out_time = toHms(services[i].runtime);
-                }
-                this.setState({services});
-            } else {
-                this.setState({services: []});
-            }
-        })
+        mqtt.send("status", false, "exec/service/" + id);
     };
 
     render() {

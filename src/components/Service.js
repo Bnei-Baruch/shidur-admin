@@ -33,20 +33,20 @@ class Service extends Component {
         this.setState({online});
         this.setDelay();
 
-        // if(online) mqtt.send("stop", false, "exec/service/"+id+"/"+service.id);
-        // if(!online) mqtt.send("start", false, "exec/service/"+id+"/"+service.id);
+        if(online) mqtt.send("stop", false, "exec/service/"+id+"/"+service.id);
+        if(!online) mqtt.send("start", false, "exec/service/"+id+"/"+service.id);
 
-        if(id.match(/^(galaxy-test)$/)) {
-            if(online) getService(id + "/stop/" + service.id, () => {});
-        } else {
-            if(online) mqtt.send("stop", false, "exec/service/"+id+"/"+service.id);
-        }
-
-        if(id.match(/^(galaxy-test)$/)) {
-            if(!online) getService(id + "/start/" + service.id, () => {});
-        } else {
-            if(!online) mqtt.send("start", false, "exec/service/"+id+"/"+service.id);
-        }
+        // if(id.match(/^(galaxy-test)$/)) {
+        //     if(online) getService(id + "/stop/" + service.id, () => {});
+        // } else {
+        //     if(online) mqtt.send("stop", false, "exec/service/"+id+"/"+service.id);
+        // }
+        //
+        // if(id.match(/^(galaxy-test)$/)) {
+        //     if(!online) getService(id + "/start/" + service.id, () => {});
+        // } else {
+        //     if(!online) mqtt.send("start", false, "exec/service/"+id+"/"+service.id);
+        // }
     };
 
     addNote = () => {
