@@ -46,11 +46,11 @@ class WebRTC extends Component {
     addNew = (source, new_prop) => {
         let conf
         if(source === "video") {
-            conf = {language: "", title: "", proxy_port: "", janus_port: "", janus_id: ""}
+            conf = {language: "", title: "", proxy_port: "", janus_port: "", janus_id: "", enabled: true}
         } else if(source === "servers") {
             conf = {role: "", title: "", dns: "", ip: "", enabled: true}
         } else {
-            conf = {language: "", proxy_port: "", janus_port: "", janus_id: "", ffmpeg_channel: ""}
+            conf = {language: "", proxy_port: "", janus_port: "", janus_id: "", ffmpeg_channel: "", enabled: true}
         }
         this.setState({open: true, source, new_prop, conf})
     };
@@ -148,7 +148,7 @@ class WebRTC extends Component {
     renderContent = () => {
         const {source,conf} = this.state;
         if(source === "video") {
-            let {language, proxy_port, janus_port, janus_id} = conf;
+            let {language, proxy_port, janus_port, janus_id, enabled} = conf;
             return (
                 <Table compact='very' basic size='small'>
                     <Table.Header>
@@ -157,6 +157,7 @@ class WebRTC extends Component {
                             <Table.HeaderCell width={1}>Proxy Port</Table.HeaderCell>
                             <Table.HeaderCell width={1}>Janus Port</Table.HeaderCell>
                             <Table.HeaderCell width={1}>Janus ID</Table.HeaderCell>
+                            <Table.HeaderCell width={1}>Enabled</Table.HeaderCell>
                         </Table.Row>
                     </Table.Header>
 
@@ -166,6 +167,7 @@ class WebRTC extends Component {
                             <Table.Cell><Input size='mini' type="number" value={proxy_port} onChange={(e) => this.setValue("proxy_port", Number(e.target.value))} /></Table.Cell>
                             <Table.Cell><Input size='mini' type="number" value={janus_port} onChange={(e) => this.setValue("janus_port", Number(e.target.value))} /></Table.Cell>
                             <Table.Cell><Input size='mini' type="number" value={janus_id} onChange={(e) => this.setValue("janus_id", Number(e.target.value))} /></Table.Cell>
+                            <Table.Cell><Checkbox onClick={() => this.setValue("enabled", !enabled)} checked={enabled} /></Table.Cell>
                         </Table.Row>
                     </Table.Body>
                 </Table>
@@ -198,7 +200,7 @@ class WebRTC extends Component {
                 </Table>
             )
         } else {
-            let {language, proxy_port, janus_port, janus_id, ffmpeg_channel} = conf;
+            let {language, proxy_port, janus_port, janus_id, ffmpeg_channel, enabled} = conf;
             return (
                 <Table compact='very' basic size='small'>
                     <Table.Header>
@@ -208,6 +210,7 @@ class WebRTC extends Component {
                             <Table.HeaderCell width={1}>Janus Port</Table.HeaderCell>
                             <Table.HeaderCell width={1}>Janus ID</Table.HeaderCell>
                             <Table.HeaderCell width={1}>Dante</Table.HeaderCell>
+                            <Table.HeaderCell width={1}>Enabled</Table.HeaderCell>
                         </Table.Row>
                     </Table.Header>
 
@@ -218,6 +221,7 @@ class WebRTC extends Component {
                             <Table.Cell><Input size='mini' type="number" value={janus_port} onChange={(e) => this.setValue("janus_port", Number(e.target.value))} /></Table.Cell>
                             <Table.Cell><Input size='mini' type="number" value={janus_id} onChange={(e) => this.setValue("janus_id", Number(e.target.value))} /></Table.Cell>
                             <Table.Cell><Input size='mini' type="number" value={ffmpeg_channel + 1} onChange={(e) => this.setValue("ffmpeg_channel", (Number(e.target.value) - 1))} /></Table.Cell>
+                            <Table.Cell><Checkbox onClick={() => this.setValue("enabled", !enabled)} checked={enabled} /></Table.Cell>
                         </Table.Row>
                     </Table.Body>
                 </Table>
@@ -243,6 +247,7 @@ class WebRTC extends Component {
                     <Table.Cell>{conf.janus_port}</Table.Cell>
                     <Table.Cell>{conf.janus_id}</Table.Cell>
                     <Table.Cell>{conf.ffmpeg_channel + 1}</Table.Cell>
+                    <Table.Cell>{conf.enabled ? v : x}</Table.Cell>
                 </Table.Row>
             )
         });
@@ -256,6 +261,7 @@ class WebRTC extends Component {
                     <Table.Cell>{conf.janus_port}</Table.Cell>
                     <Table.Cell>{conf.janus_id}</Table.Cell>
                     <Table.Cell>{conf.ffmpeg_channel + 1}</Table.Cell>
+                    <Table.Cell>{conf.enabled ? v : x}</Table.Cell>
                 </Table.Row>
             )
         });
@@ -269,6 +275,7 @@ class WebRTC extends Component {
                     <Table.Cell>{conf.janus_port}</Table.Cell>
                     <Table.Cell>{conf.janus_id}</Table.Cell>
                     <Table.Cell>{conf.ffmpeg_channel + 1}</Table.Cell>
+                    <Table.Cell>{conf.enabled ? v : x}</Table.Cell>
                 </Table.Row>
             )
         });
@@ -282,6 +289,7 @@ class WebRTC extends Component {
                     <Table.Cell>{conf.janus_port}</Table.Cell>
                     <Table.Cell>{conf.janus_id}</Table.Cell>
                     <Table.Cell>{conf.ffmpeg_channel + 1}</Table.Cell>
+                    <Table.Cell>{conf.enabled ? v : x}</Table.Cell>
                 </Table.Row>
             )
         });
@@ -294,6 +302,7 @@ class WebRTC extends Component {
                     <Table.Cell>{conf.proxy_port}</Table.Cell>
                     <Table.Cell>{conf.janus_port}</Table.Cell>
                     <Table.Cell>{conf.janus_id}</Table.Cell>
+                    <Table.Cell>{conf.enabled ? v : x}</Table.Cell>
                 </Table.Row>
             )
         });
@@ -322,6 +331,7 @@ class WebRTC extends Component {
                                 <Table.HeaderCell width={1}>Proxy Port</Table.HeaderCell>
                                 <Table.HeaderCell width={1}>Janus Port</Table.HeaderCell>
                                 <Table.HeaderCell width={1}>Janus ID</Table.HeaderCell>
+                                <Table.HeaderCell width={1}>Enabled</Table.HeaderCell>
                             </Table.Row>
                         </Table.Header>
 
@@ -341,6 +351,7 @@ class WebRTC extends Component {
                                     <Table.HeaderCell width={1}>Janus Port</Table.HeaderCell>
                                     <Table.HeaderCell width={1}>Janus ID</Table.HeaderCell>
                                     <Table.HeaderCell width={1}>Dante</Table.HeaderCell>
+                                    <Table.HeaderCell width={1}>Enabled</Table.HeaderCell>
                                 </Table.Row>
                             </Table.Header>
 
@@ -360,6 +371,7 @@ class WebRTC extends Component {
                                     <Table.HeaderCell width={1}>Janus Port</Table.HeaderCell>
                                     <Table.HeaderCell width={1}>Janus ID</Table.HeaderCell>
                                     <Table.HeaderCell width={1}>Dante</Table.HeaderCell>
+                                    <Table.HeaderCell width={1}>Enabled</Table.HeaderCell>
                                 </Table.Row>
                             </Table.Header>
 
@@ -379,6 +391,7 @@ class WebRTC extends Component {
                                     <Table.HeaderCell width={1}>Janus Port</Table.HeaderCell>
                                     <Table.HeaderCell width={1}>Janus ID</Table.HeaderCell>
                                     <Table.HeaderCell width={1}>Dante</Table.HeaderCell>
+                                    <Table.HeaderCell width={1}>Enabled</Table.HeaderCell>
                                 </Table.Row>
                             </Table.Header>
 
@@ -398,6 +411,7 @@ class WebRTC extends Component {
                                     <Table.HeaderCell width={1}>Janus Port</Table.HeaderCell>
                                     <Table.HeaderCell width={1}>Janus ID</Table.HeaderCell>
                                     <Table.HeaderCell width={1}>Dante</Table.HeaderCell>
+                                    <Table.HeaderCell width={1}>Enabled</Table.HeaderCell>
                                 </Table.Row>
                             </Table.Header>
 
