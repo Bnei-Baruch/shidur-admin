@@ -65,7 +65,7 @@ class Galaxy extends Component {
         }
         const id = "janus-" + (encoder.services.length + 1).toString();
         const description = room.description;
-        const cmd = `janus.py --play-from video.mp4 --room ${room.room} https://gxy9.kli.one/janusgxy`;
+        const cmd = `janus.py --play-from video.mp4 --room ${room.room} https://gxy9.kab.sh/janusgxy`;
         const args = cmd.split(" ");
         encoder.services.push({description, id, name: "python3", args});
         this.saveData(encoder)

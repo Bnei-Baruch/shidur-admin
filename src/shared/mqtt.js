@@ -1,5 +1,5 @@
 import mqtt from 'mqtt';
-import {MQTT_LCL_URL, MQTT_EXT_URL} from "./tools";
+import {MQTT_URL} from "./tools";
 
 class MqttMsg {
 
@@ -31,10 +31,7 @@ class MqttMsg {
             transformWsUrl: transformUrl,
         };
 
-        // const local = window.location.hostname === "shidur.bbdomain.org";
-        // const url = local ? MQTT_LCL_URL : MQTT_EXT_URL;
-        const url = MQTT_LCL_URL
-        this.mq = mqtt.connect(`wss://${url}`, options);
+        this.mq = mqtt.connect(`wss://${MQTT_URL}`, options);
 
         this.mq.on('connect', (data) => {
             if(data && !this.connected) {
