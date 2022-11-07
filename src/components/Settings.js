@@ -1,5 +1,5 @@
 import React, {Component, Fragment} from 'react'
-import {Table, Input, Button, Tab, Modal, Header, Menu, Icon} from 'semantic-ui-react'
+import {Table, Input, Button, Tab, Modal, Header, Menu, Icon, TextArea} from 'semantic-ui-react'
 import {getData, putData, removeData} from "../shared/tools";
 
 
@@ -110,7 +110,13 @@ class Settings extends Component {
                             <Table.Row key={i} >
                                 <Table.Cell><Input value={id} onChange={(e) => this.setServ("id", e.target.value, i)} /></Table.Cell>
                                 <Table.Cell><Input value={name} onChange={(e) => this.setServ("name", e.target.value, i)} /></Table.Cell>
-                                <Table.Cell><Input value={args} onChange={(e) => this.setServ("args", e.target.value, i)} /></Table.Cell>
+                                <Table.Cell>
+                                    <Modal trigger={<Button basic>Edit Command Line</Button>}>
+                                        <Modal.Content>
+                                            <TextArea style={{ minWidth: 900 }} rows={20} value={args} onChange={(e) => this.setServ("args", e.target.value, i)} />
+                                        </Modal.Content>
+                                    </Modal>
+                                </Table.Cell>
                             </Table.Row>
                         )
                     })}
