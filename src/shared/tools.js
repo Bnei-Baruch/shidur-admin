@@ -17,6 +17,17 @@ export const SRV_URL = process.env.REACT_APP_SRV_URL;
 export const LIVE_URL = process.env.REACT_APP_LIVE_URL;
 export const KC_URL = process.env.REACT_APP_KC_URL;
 export const MQTT_URL = process.env.REACT_APP_MQTT_LCL_URL;
+export const STUN_SRV_GXY = process.env.REACT_APP_STUN_SRV_GXY;
+
+export const randomString = (len) => {
+    let charSet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let randomString = "";
+    for (let i = 0; i < len; i++) {
+        let randomPoz = Math.floor(Math.random() * charSet.length);
+        randomString += charSet.substring(randomPoz, randomPoz + 1);
+    }
+    return randomString;
+};
 
 export const toHms = (totalSec) => {
     let d = parseInt(totalSec / (3600*24));

@@ -115,7 +115,7 @@ class App extends Component {
                   <Encoders jsonState={this.setJsonState}
                             idState={this.setIdState}
                             id={encoder_id} shidur_galaxy={shidur_galaxy}
-                            encoders={encoders} onRef={ref => (this.cap = ref)} />
+                            encoders={encoders} onRef={ref => (this.cap = ref)} user={user} />
               </Tab.Pane> },
           // { menuItem: { key: 'decoder', icon: 'record', content: 'Decoders', disabled: !shidur_root },
           //     render: () => <Tab.Pane attached={false} >

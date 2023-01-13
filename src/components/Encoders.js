@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
 import {Divider, Table, Segment, Label, Dropdown, Message, Button, List, Menu, Checkbox, Select} from 'semantic-ui-react'
 import {getService, toHms, putData, getRooms} from "../shared/tools";
+import {initJanus, destroyJanus} from "../shared/media";
 import Service from "./Service";
 import mqtt from "../shared/mqtt";
 
@@ -15,7 +16,8 @@ class Encoders extends Component {
         ival: null,
         services: [],
         status: "",
-        stat: {cpu: "", hdd: "", temp: ""}
+        stat: {cpu: "", hdd: "", temp: ""},
+        preview: false
     };
 
     componentDidMount() {
@@ -123,6 +125,19 @@ class Encoders extends Component {
         this.setState({ival});
     };
 
+    switchPreview = () => {
+        this.setState({preview: !this.state.preview}, () => {
+            if(this.state.preview) {
+                initJanus(this.props.user, "live", (stream) => {
+                    let remotevideo = this.refs["pv" + 1];
+                    if (remotevideo) remotevideo.srcObject = stream;
+                })
+            } else {
+                destroyJanus()
+            }
+        });
+    }
+
     getStat = () => {
         const {id} = this.state;
         mqtt.send("status", false, "exec/service/" + id);
@@ -142,7 +157,7 @@ class Encoders extends Component {
     render() {
 
         const {encoders} = this.props;
-        const {encoder, id, status, stat, services, room, rooms} = this.state;
+        const {encoder, id, status, stat, services, room, rooms, preview} = this.state;
 
         let rooms_options = rooms.map((r, i) => {
             return({ key: i, text: r.description, value: r });
@@ -205,6 +220,21 @@ class Encoders extends Component {
                     </Table>
                 : null}
 
+                {preview ?
+                    <video
+                        key="pv1"
+                        ref="pv1"
+                        id="pv1"
+                        width={640}
+                        height={360}
+                        autoPlay={true}
+                        controls={true}
+                        muted={true}
+                        playsInline={true}
+                    />
+                    : null
+                }
+
                 {id === "galaxy-test" ?
                     <div><Divider />
                         <Label size='big' >
@@ -231,30 +261,38 @@ class Encoders extends Component {
                                 </Button.Group>
                             </Menu.Item>
 
-                            {id.match(/^mac-/) ? null :
+                            {id === "knasim-record" || id === "knasim-webrtc" ?
                                 <Menu.Item position='right'>
-                                    <List className='stat' size='small'>
-                                        <List.Item>
-                                            <List.Icon name='microchip'/>
-                                            <List.Content
-                                                className={parseInt(stat.cpu) > 90 ? "warning" : ""}>
-                                                CPU: <b>{stat.cpu}</b></List.Content>
-                                        </List.Item>
-                                        <List.Item>
-                                            <List.Icon name='server'/>
-                                            <List.Content
-                                                className={parseInt(stat.hdd) > 90 ? "warning" : ""}>
-                                                HDD: <b>{stat.hdd}</b></List.Content>
-                                        </List.Item>
-                                        <List.Item>
-                                            <List.Icon name='thermometer'/>
-                                            <List.Content
-                                                className={parseInt(stat.temp) > 80 ? "warning" : ""}>
-                                                TMP: <b>{stat.temp}</b></List.Content>
-                                        </List.Item>
-                                    </List>
+                                    <Button color={preview ? "green" : "red"}
+                                            onClick={this.switchPreview}>Preview</Button>
                                 </Menu.Item>
+                                : null
                             }
+
+                            {/*{id.match(/^mac-/) ? null :*/}
+                            {/*    <Menu.Item position='right'>*/}
+                            {/*        <List className='stat' size='small'>*/}
+                            {/*            <List.Item>*/}
+                            {/*                <List.Icon name='microchip'/>*/}
+                            {/*                <List.Content*/}
+                            {/*                    className={parseInt(stat.cpu) > 90 ? "warning" : ""}>*/}
+                            {/*                    CPU: <b>{stat.cpu}</b></List.Content>*/}
+                            {/*            </List.Item>*/}
+                            {/*            <List.Item>*/}
+                            {/*                <List.Icon name='server'/>*/}
+                            {/*                <List.Content*/}
+                            {/*                    className={parseInt(stat.hdd) > 90 ? "warning" : ""}>*/}
+                            {/*                    HDD: <b>{stat.hdd}</b></List.Content>*/}
+                            {/*            </List.Item>*/}
+                            {/*            <List.Item>*/}
+                            {/*                <List.Icon name='thermometer'/>*/}
+                            {/*                <List.Content*/}
+                            {/*                    className={parseInt(stat.temp) > 80 ? "warning" : ""}>*/}
+                            {/*                    TMP: <b>{stat.temp}</b></List.Content>*/}
+                            {/*            </List.Item>*/}
+                            {/*        </List>*/}
+                            {/*    </Menu.Item>*/}
+                            {/*}*/}
                         </Menu>
                     </Message>
                 }

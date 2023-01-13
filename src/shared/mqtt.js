@@ -1,5 +1,6 @@
 import mqtt from 'mqtt';
 import {MQTT_URL} from "./tools";
+import log from "loglevel";
 
 class MqttMsg {
 
@@ -32,6 +33,7 @@ class MqttMsg {
         };
 
         this.mq = mqtt.connect(`wss://${MQTT_URL}`, options);
+        this.mq.setMaxListeners(50)
 
         this.mq.on('connect', (data) => {
             if(data && !this.connected) {
@@ -61,19 +63,40 @@ class MqttMsg {
         })
     }
 
-    send = (message, retain, topic) => {
-        //console.debug("[mqtt] Send data on topic: ", topic, message)
-        let options = {qos: 1, retain};
+    // send = (message, retain, topic) => {
+    //     console.debug("[mqtt] Send data on topic: ", topic, message)
+    //     let options = {qos: 1, retain};
+    //     this.mq.publish(topic, message, {...options}, (err) => {
+    //         err && console.error('[mqtt] Error: ',err);
+    //     })
+    // }
+
+    send = (message, retain, topic, rxTopic, user) => {
+        if (!this.mq) return;
+        log.debug("%c[mqtt] --> send message | topic: " + topic + " | data: " + message, "color: darkgrey");
+        let properties = !!rxTopic ? {userProperties: user || this.user, responseTopic: rxTopic} : {userProperties: user || this.user};
+        let options = {qos: 1, retain, properties};
         this.mq.publish(topic, message, {...options}, (err) => {
-            err && console.error('[mqtt] Error: ',err);
-        })
-    }
+            err && log.error("[mqtt] Error: ", err);
+        });
+    };
 
     watch = (callback, stat) => {
         this.mq.on('message',  (topic, data, packet) => {
-            let message = stat ? data.toString() : JSON.parse(data.toString());
-            //console.debug("[mqtt] Got data on topic: ", topic);
-            callback(message, topic)
+            let cd = packet?.properties?.correlationData ? " | transaction: " + packet?.properties?.correlationData?.toString() : ""
+            log.debug("%c[mqtt] <-- receive message" + cd + " | topic : " + topic, "color: darkgrey");
+            const t = topic.split("/")
+            const [root, service, id, target] = t
+            switch(root) {
+                case "janus":
+                    const json = JSON.parse(data)
+                    const mit = json?.session_id || packet?.properties?.userProperties?.mit || service
+                    this.mq.emit(mit, data, id);
+                    break;
+                default:
+                    if(typeof callback === "function")
+                        callback(JSON.parse(data.toString()), topic);
+            }
         })
     }
 
