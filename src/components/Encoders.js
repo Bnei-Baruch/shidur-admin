@@ -220,21 +220,6 @@ class Encoders extends Component {
                     </Table>
                 : null}
 
-                {preview ?
-                    <video
-                        key="pv1"
-                        ref="pv1"
-                        id="pv1"
-                        width={640}
-                        height={360}
-                        autoPlay={true}
-                        controls={true}
-                        muted={true}
-                        playsInline={true}
-                    />
-                    : null
-                }
-
                 {id === "galaxy-test" ?
                     <div><Divider />
                         <Label size='big' >
@@ -296,6 +281,22 @@ class Encoders extends Component {
                         </Menu>
                     </Message>
                 }
+
+                {preview ?
+                    <video
+                        key="pv1"
+                        ref="pv1"
+                        id="pv1"
+                        width={640}
+                        height={360}
+                        autoPlay={true}
+                        controls={true}
+                        muted={true}
+                        playsInline={true}
+                    />
+                    : null
+                }
+
             </Segment>
         );
     }
