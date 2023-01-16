@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 import {Divider, Table, Segment, Label, Dropdown, Message, Button, List, Menu, Checkbox, Select} from 'semantic-ui-react'
-import {getService, toHms, putData, getRooms} from "../shared/tools";
+import {getService, toHms, putData, getRooms, cloneStream, destroyStream} from "../shared/tools";
 import {initJanus, destroyJanus} from "../shared/media";
 import Service from "./Service";
 import mqtt from "../shared/mqtt";
@@ -31,6 +31,8 @@ class Encoders extends Component {
     componentWillUnmount() {
         this.props.onRef(undefined)
         clearInterval(this.state.ival);
+        destroyJanus()
+        destroyStream()
     };
 
     onMqttMessage = (message, topic) => {
@@ -137,10 +139,12 @@ class Encoders extends Component {
                     if (track.kind === "audio" && on) {
                         let remoteaudio = this.refs["pa" + 1];
                         if (remoteaudio) remoteaudio.srcObject = stream;
+                        cloneStream(stream, 1);
                     }
                 })
             } else {
                 destroyJanus()
+                destroyStream()
             }
         });
     }
@@ -148,17 +152,6 @@ class Encoders extends Component {
     getStat = () => {
         const {id} = this.state;
         mqtt.send("status", false, "exec/service/" + id);
-        // getService(id + "/status", (services) => {
-        //     if(services) {
-        //         for(let i=0; i<services.length; i++) {
-        //             //services[i].out_time = services[i].log.split('time=')[1].split('.')[0];
-        //             services[i].out_time = toHms(services[i].runtime);
-        //         }
-        //         this.setState({services});
-        //     } else {
-        //         this.setState({services: []});
-        //     }
-        // })
     };
 
     render() {
@@ -308,9 +301,12 @@ class Encoders extends Component {
                             id="pa1"
                             autoPlay={true}
                             controls={false}
-                            muted={false}
+                            muted={true}
                             playsInline={true}
                         />
+                        <Message className='vu'>
+                            <canvas ref={"canvas" + 1} id={"canvas" + 1} width="630" height="10" />
+                        </Message>
                     </div>
                     : null
                 }

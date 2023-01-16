@@ -2,6 +2,10 @@
      text-align: center;
  }
 
+.vu {
+    padding: 0.1em 0.5em!important;
+}
+
 .or_buttons {
     text-align: left;
 }

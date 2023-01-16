@@ -16,8 +16,105 @@ export const PROXY_BACKEND = process.env.REACT_APP_PROXY_BACKEND;
 export const SRV_URL = process.env.REACT_APP_SRV_URL;
 export const LIVE_URL = process.env.REACT_APP_LIVE_URL;
 export const KC_URL = process.env.REACT_APP_KC_URL;
+//export const MQTT_URL = process.env.REACT_APP_MQTT_LCL_URL;
 export const MQTT_URL = process.env.REACT_APP_MQTT_LCL_URL;
 export const STUN_SRV_GXY = process.env.REACT_APP_STUN_SRV_GXY;
+
+var p = {};
+
+export const destroyStream = () => {
+    if(window["out"+1]) window["out"+1].remove()
+    clearInterval(p[1])
+}
+
+function getBufferAverage(analyser) {
+    var array =  new Uint8Array(analyser.frequencyBinCount);
+    analyser.getByteFrequencyData(array);
+    var average = getAverageVolume(array);
+    return average;
+}
+
+function getAverageVolume(array) {
+    var values = 0;
+    var average;
+    var length = array.length;
+    for (var i = 0; i < length; i++) {
+        values += array[i];
+    }
+    average = values / length;
+    return average;
+}
+
+const stereoVisualizer = (analyser1, analyser2, canvas, width, n) => {
+    let mn = width/128;
+
+    let drawContext = canvas.getContext('2d');
+    let gradient = drawContext.createLinearGradient(0,0,width,10);
+    gradient.addColorStop(0,'green');
+    gradient.addColorStop(0.20,'#80ff00');
+    gradient.addColorStop(0.85,'orange');
+    gradient.addColorStop(1,'red');
+
+    let sampleAudioStream = () => {
+        let average1 = getBufferAverage(analyser1);
+        let average2 = getBufferAverage(analyser2);
+        drawContext.clearRect(0, 0, width, 40);
+        drawContext.fillStyle=gradient;
+        drawContext.fillRect(0,0,average1*mn,10);
+        drawContext.fillRect(0,15, average2*mn,10);
+    };
+
+    p[n] = setInterval(sampleAudioStream, 50);
+};
+
+const streamVisualizer = (analyser, canvas, width, n) => {
+    let mn = width/128;
+
+    let drawContext = canvas.getContext('2d');
+    let gradient = drawContext.createLinearGradient(0,0,width,10);
+    gradient.addColorStop(0,'green');
+    gradient.addColorStop(0.20,'#80ff00');
+    gradient.addColorStop(0.85,'orange');
+    gradient.addColorStop(1,'red');
+
+    let sampleAudioStream = () => {
+        let average = getBufferAverage(analyser);
+        drawContext.clearRect(0, 0, width, 40);
+        drawContext.fillStyle=gradient;
+        drawContext.fillRect(0,0,average*mn,10);
+    };
+
+    p[n] = setInterval(sampleAudioStream, 50);
+};
+
+export const cloneStream = (stream, n, stereo) => {
+    let context = new AudioContext();
+    let source = context.createMediaStreamSource(stream);
+    let destination = context.createMediaStreamDestination();
+    source.connect(destination);
+    window["out"+n] = new Audio();
+    window["out"+n].srcObject = destination.stream;
+    window["out"+n].play();
+    let device = localStorage.getItem("device" + n);
+    if(device) {
+        window["out"+n].setSinkId(device)
+            .then(() => Janus.log('Success, audio output device attached: ' + device))
+            .catch((error) => Janus.error(error));
+    }
+    if(stereo) {
+        let analyser1 = context.createAnalyser();
+        let analyser2 = context.createAnalyser();
+        let splitter = context.createChannelSplitter(2);
+        source.connect(splitter);
+        splitter.connect(analyser1,0,0);
+        splitter.connect(analyser2,1,0);
+        stereoVisualizer(analyser1, analyser2, document.getElementById('canvas'+n),630,n);
+    } else {
+        let analyzer = context.createAnalyser();
+        source.connect(analyzer);
+        streamVisualizer(analyzer, document.getElementById('canvas'+n),630,n);
+    }
+};
 
 export const randomString = (len) => {
     let charSet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";

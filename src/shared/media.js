@@ -25,7 +25,7 @@ export const initJanus = (user, gxy, cb) => {
 }
 
 export const destroyJanus = () =>{
-    janus.destroy()
+    if(janus) janus.destroy()
 }
 
 const initPlugin = (callback) => {
