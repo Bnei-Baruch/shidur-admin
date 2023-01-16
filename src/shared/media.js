@@ -28,19 +28,14 @@ export const destroyJanus = () =>{
     janus.destroy()
 }
 
-const initPlugin = (cb) => {
+const initPlugin = (callback) => {
 
     subscriber = new SubscriberPlugin();
 
-    subscriber.onTrack = (track, mid, on) => {
-        if (track.kind === "video" && on) {
-            let stream = new MediaStream([track]);
-            cb(stream)
-        }
-    };
+    subscriber.onTrack = callback
 
     subscriber.onUpdate = onUpdateStreams;
-    let subscription = [{feed: 1, mid: "0"}]
+    let subscription = [{feed: 1, mid: "0"},{feed: 1, mid: "1"}]
 
     janus.attach(subscriber).then(data => {
         log.info("[subscriber] Subscriber Handle: ", data)

@@ -128,9 +128,16 @@ class Encoders extends Component {
     switchPreview = () => {
         this.setState({preview: !this.state.preview}, () => {
             if(this.state.preview) {
-                initJanus(this.props.user, "live", (stream) => {
-                    let remotevideo = this.refs["pv" + 1];
-                    if (remotevideo) remotevideo.srcObject = stream;
+                initJanus(this.props.user, "live", (track, mid, on) => {
+                    let stream = new MediaStream([track]);
+                    if (track.kind === "video" && on) {
+                        let remotevideo = this.refs["pv" + 1];
+                        if (remotevideo) remotevideo.srcObject = stream;
+                    }
+                    if (track.kind === "audio" && on) {
+                        let remoteaudio = this.refs["pa" + 1];
+                        if (remoteaudio) remoteaudio.srcObject = stream;
+                    }
                 })
             } else {
                 destroyJanus()
@@ -283,17 +290,28 @@ class Encoders extends Component {
                 }
 
                 {preview ?
-                    <video
-                        key="pv1"
-                        ref="pv1"
-                        id="pv1"
-                        width={640}
-                        height={360}
-                        autoPlay={true}
-                        controls={true}
-                        muted={true}
-                        playsInline={true}
-                    />
+                    <div>
+                        <video
+                            key="pv1"
+                            ref="pv1"
+                            id="pv1"
+                            width={640}
+                            height={360}
+                            autoPlay={true}
+                            controls={true}
+                            muted={true}
+                            playsInline={true}
+                        />
+                        <audio
+                            key="pa1"
+                            ref="pa1"
+                            id="pa1"
+                            autoPlay={true}
+                            controls={false}
+                            muted={false}
+                            playsInline={true}
+                        />
+                    </div>
                     : null
                 }
 
