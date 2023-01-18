@@ -197,7 +197,7 @@ class Encoders extends Component {
 
         const infoPopup = (
             <Popup
-                trigger={<Button positive icon="info" onClick={this.getEncoderStats} />}
+                trigger={<Button color="blue" icon="info" onClick={this.getEncoderStats} />}
                 position="bottom left"
                 content={
                     <List as="ul">
