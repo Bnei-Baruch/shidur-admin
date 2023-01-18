@@ -1,9 +1,24 @@
 import log from "loglevel";
 import {JanusMqtt} from "../lib/janus-mqtt";
 import {SubscriberPlugin} from "../lib/subscriber-plugin";
+import {randomString} from "shared/tools";
+import mqtt from "./mqtt";
 
 
-let janus, subscriber
+let janus, subscriber, session, handle
+
+export const getStats = () => {
+    console.log(janus)
+    const request = {
+        janus: "handle_info",
+        session_id: session,
+        handle_id: handle,
+        transaction: randomString(12),
+        admin_secret: "janusoverlord"
+    }
+
+    mqtt.send(JSON.stringify(request), false, "janus/live/to-janus-admin", "janus/live/from-janus-admin")
+}
 
 export const initJanus = (user, gxy, cb) => {
     log.info("[Janus] Janus init")
@@ -41,6 +56,9 @@ const initPlugin = (callback) => {
         log.info("[subscriber] Subscriber Handle: ", data)
         subscriber.join(subscription, 1234).then(data => {
             log.info("[subscriber] join: ", data)
+            let user = JSON.parse(data.streams[0].feed_display)
+            session = user.session;
+            handle = user.handle;
             onUpdateStreams(data.streams);
         });
     })

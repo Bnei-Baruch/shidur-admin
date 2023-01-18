@@ -24,6 +24,7 @@ export class JanusMqtt {
   init(token) {
     this.token = token
     mqtt.join(this.rxTopic + "/" + this.user.id, false);
+    mqtt.join("janus/live/from-janus-admin", false);
     mqtt.join(this.rxTopic, false);
     mqtt.join(this.stTopic, false);
 
@@ -241,6 +242,7 @@ export class JanusMqtt {
     mqtt.exit(this.rxTopic + "/" + this.user.id);
     mqtt.exit(this.rxTopic);
     mqtt.exit(this.stTopic);
+    mqtt.exit("janus/live/from-janus-admin");
 
     mqtt.mq.removeListener(this.srv, this.onMessage);
     if(this.user.mit) mqtt.mq.removeListener(this.user.mit, this.onMessage);

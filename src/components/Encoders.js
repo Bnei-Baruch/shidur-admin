@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
-import {Divider, Table, Segment, Label, Dropdown, Message, Button, List, Menu, Checkbox, Select} from 'semantic-ui-react'
+import {Divider, Table, Segment, Label, Dropdown, Message, Button, List, Menu, Checkbox, Select, Popup} from 'semantic-ui-react'
 import {getService, toHms, putData, getRooms, cloneStream, destroyStream} from "../shared/tools";
-import {initJanus, destroyJanus} from "../shared/media";
+import {initJanus, destroyJanus, getStats} from "../shared/media";
 import Service from "./Service";
 import mqtt from "../shared/mqtt";
 
@@ -10,6 +10,7 @@ class Encoders extends Component {
 
     state = {
         encoder: {},
+        feed_rtcp: {},
         id: "",
         room: {"room":1051,"janus":"gxy8","description":"Test Room","questions":false,"num_users":0,"users":null,"region":"","extra":null},
         rooms: [{"room":1051,"janus":"gxy8","description":"Test Room","questions":false,"num_users":0,"users":null,"region":"","extra":null}],
@@ -36,19 +37,29 @@ class Encoders extends Component {
     };
 
     onMqttMessage = (message, topic) => {
-        //console.debug("[encoders] Message: ", message);
         let services = message.data;
         const local = true
         const src = local ? topic.split("/")[3] : topic.split("/")[4];
         if(services && this.state.id === src) {
             for(let i=0; i<services.length; i++) {
-                //services[i].out_time = services[i].log.split('time=')[1].split('.')[0];
                 services[i].out_time = toHms(services[i].runtime);
             }
-            //console.debug("[capture] Message: ", services);
             this.setState({services});
-            // } else {
-            //     this.setState({services: []});
+        } else if (topic === "janus/live/from-janus-admin") {
+            const data = message;
+            const m0 = data.info.webrtc.media[0];
+            const m1 = data.info.webrtc.media[1];
+            let video = null;
+            let audio = null;
+            if (m0 && m1) {
+                audio = data.info.webrtc.media[0].rtcp.main;
+                video = data.info.webrtc.media[1].rtcp.main;
+            } else if (m0.type === "audio") {
+                audio = data.info.webrtc.media[0].rtcp.main;
+            } else if (m0.type === "video") {
+                video = data.info.webrtc.media[0].rtcp.main;
+            }
+            this.setState({feed_rtcp: {video, audio}});
         }
     };
 
@@ -154,10 +165,14 @@ class Encoders extends Component {
         mqtt.send("status", false, "exec/service/" + id);
     };
 
+    getEncoderStats = () => {
+        getStats()
+    }
+
     render() {
 
         const {encoders} = this.props;
-        const {encoder, id, status, stat, services, room, rooms, preview} = this.state;
+        const {encoder, id, status, feed_rtcp, services, room, rooms, preview} = this.state;
 
         let rooms_options = rooms.map((r, i) => {
             return({ key: i, text: r.description, value: r });
@@ -179,6 +194,43 @@ class Encoders extends Component {
             return (<Service key={i} index={i} service={services[i]} id={id}
                              saveData={this.saveData} removeRestream={this.delService} addNote={this.addNote} />);
         });
+
+        const infoPopup = (
+            <Popup
+                trigger={<Button positive icon="info" onClick={this.getEncoderStats} />}
+                position="bottom left"
+                content={
+                    <List as="ul">
+                        {feed_rtcp.video ? (
+                            <List.Item as="li">
+                                Video
+                                <List.List as="ul">
+                                    <List.Item as="li">in-link-quality: {feed_rtcp.video["in-link-quality"]}</List.Item>
+                                    <List.Item as="li">in-media-link-quality: {feed_rtcp.video["in-media-link-quality"]}</List.Item>
+                                    <List.Item as="li">jitter-local: {feed_rtcp.video["jitter-local"]}</List.Item>
+                                    <List.Item as="li">jitter-remote: {feed_rtcp.video["jitter-remote"]}</List.Item>
+                                    <List.Item as="li">lost: {feed_rtcp.video["lost"]}</List.Item>
+                                </List.List>
+                            </List.Item>
+                        ) : null}
+                        {feed_rtcp.audio ? (
+                            <List.Item as="li">
+                                Audio
+                                <List.List as="ul">
+                                    <List.Item as="li">in-link-quality: {feed_rtcp.audio["in-link-quality"]}</List.Item>
+                                    <List.Item as="li">in-media-link-quality: {feed_rtcp.audio["in-media-link-quality"]}</List.Item>
+                                    <List.Item as="li">jitter-local: {feed_rtcp.audio["jitter-local"]}</List.Item>
+                                    <List.Item as="li">jitter-remote: {feed_rtcp.audio["jitter-remote"]}</List.Item>
+                                    <List.Item as="li">lost: {feed_rtcp.audio["lost"]}</List.Item>
+                                </List.List>
+                            </List.Item>
+                        ) : null}
+                    </List>
+                }
+                on="click"
+                hideOnScroll
+            />
+        );
 
         return(
             <Segment textAlign='center' basic >
@@ -236,22 +288,23 @@ class Encoders extends Component {
                 {!id ? null :
                     <Message className='or_buttons'>
                         <Menu fluid secondary text>
-                            <Menu.Item>
-                                <Button.Group>
-                                    <Button positive
-                                            onClick={this.startEncoder}>Start</Button>
-                                    <Button.Or text='all'/>
-                                    <Button negative
-                                            onClick={this.stopEncoder}>Stop</Button>
-                                </Button.Group>
-                            </Menu.Item>
 
                             {id === "knasim-record" || id === "knasim-webrtc" ?
-                                <Menu.Item position='right'>
-                                    <Button color={preview ? "green" : "red"}
-                                            onClick={this.switchPreview}>Preview</Button>
+                                <Menu.Item>
+                                    <Button icon="eye" color={preview ? "green" : "red"}
+                                            onClick={this.switchPreview} />
+                                    {preview ? infoPopup : null}
                                 </Menu.Item>
-                                : null
+                                :
+                                <Menu.Item>
+                                    <Button.Group>
+                                        <Button positive
+                                                onClick={this.startEncoder}>Start</Button>
+                                        <Button.Or text='all'/>
+                                        <Button negative
+                                                onClick={this.stopEncoder}>Stop</Button>
+                                    </Button.Group>
+                                </Menu.Item>
                             }
 
                             {/*{id.match(/^mac-/) ? null :*/}
@@ -278,6 +331,7 @@ class Encoders extends Component {
                             {/*        </List>*/}
                             {/*    </Menu.Item>*/}
                             {/*}*/}
+
                         </Menu>
                     </Message>
                 }

@@ -84,14 +84,18 @@ class MqttMsg {
     watch = (callback, stat) => {
         this.mq.on('message',  (topic, data, packet) => {
             let cd = packet?.properties?.correlationData ? " | transaction: " + packet?.properties?.correlationData?.toString() : ""
-            log.debug("%c[mqtt] <-- receive message" + cd + " | topic : " + topic, "color: darkgrey");
+            log.debug("%c[mqtt] <-- receive message" + cd + " | topic : " + topic, "color: darkgrey", JSON.parse(data));
             const t = topic.split("/")
             const [root, service, id, target] = t
             switch(root) {
                 case "janus":
                     const json = JSON.parse(data)
                     const mit = json?.session_id || packet?.properties?.userProperties?.mit || service
-                    this.mq.emit(mit, data, id);
+                    if(id === "from-janus-admin") {
+                        callback(JSON.parse(data.toString()), topic);
+                    } else {
+                        this.mq.emit(mit, data, id);
+                    }
                     break;
                 default:
                     if(typeof callback === "function")
