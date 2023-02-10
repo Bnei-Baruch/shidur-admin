@@ -84,6 +84,13 @@ class Settings extends Component {
         });
     };
 
+    remService = (i) => {
+        const {props} = this.state;
+        props.services.splice(i,1);
+        console.log("removeProp callback: ", props);
+        this.setState({props});
+    }
+
     renderContent = () => {
         const {props} = this.state;
         let {name, ip, description, services = []} = props;
@@ -94,6 +101,7 @@ class Settings extends Component {
                         <Table.HeaderCell width={1}>Name</Table.HeaderCell>
                         <Table.HeaderCell width={1}>IP</Table.HeaderCell>
                         <Table.HeaderCell width={1}>Description</Table.HeaderCell>
+                        <Table.HeaderCell width={1}>X</Table.HeaderCell>
                     </Table.Row>
                 </Table.Header>
 
@@ -117,6 +125,7 @@ class Settings extends Component {
                                         </Modal.Content>
                                     </Modal>
                                 </Table.Cell>
+                                <Table.Cell><Button size="mini" color="red" onClick={() => this.remService(i)}>X</Button></Table.Cell>
                             </Table.Row>
                         )
                     })}
@@ -124,7 +133,7 @@ class Settings extends Component {
 
                 <Table.Footer>
                     <Table.Row>
-                        <Table.HeaderCell colSpan='3'>
+                        <Table.HeaderCell colSpan='4'>
                             <Button size="mini" fluid onClick={this.newServ}>Add Service</Button>
                         </Table.HeaderCell>
                     </Table.Row>
@@ -189,13 +198,13 @@ class Settings extends Component {
                                     <Icon name='save outline'/> Save
                                 </Button>
                             </Menu.Item>
-                            <Menu.Item position='right'>
-                                {new_prop ? "" :
-                                    <Button negative onClick={this.removeProp}>
-                                        <Icon name='cancel'/> Remove
-                                    </Button>
-                                }
-                            </Menu.Item>
+                            {/*<Menu.Item position='right'>*/}
+                            {/*    {new_prop ? "" :*/}
+                            {/*        <Button negative onClick={this.removeProp}>*/}
+                            {/*            <Icon name='cancel'/> Remove*/}
+                            {/*        </Button>*/}
+                            {/*    }*/}
+                            {/*</Menu.Item>*/}
                         </Menu>
                     </Modal.Actions>
                 </Modal>
