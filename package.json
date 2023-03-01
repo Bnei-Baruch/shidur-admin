@@ -17,6 +17,7 @@
     "loglevel": "^1.8.1",
     "mqtt": "^4.3.7",
     "react": "^18.2.0",
+    "react-datepicker": "^4.10.0",
     "react-dom": "^18.2.0",
     "semantic-ui-css": "^2.4.1",
     "semantic-ui-react": "^2.1.3",

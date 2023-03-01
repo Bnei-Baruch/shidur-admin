@@ -1,9 +1,10 @@
 import React, {Component} from 'react'
 //import moment from 'moment';
-//import DatePicker from 'react-datepicker';
-//import 'react-datepicker/dist/react-datepicker.css';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import {Divider, Table, Segment, Label, Dropdown, Select, Message, Button, Icon} from 'semantic-ui-react'
-import {getWorkflowData, langch_options, streamFetcher, vres_options} from "../shared/tools";
+import {getWorkflowData, langch_options, streamFetcher, toHms, vres_options} from "../shared/tools";
+import mqtt from "../shared/mqtt";
 
 
 class Playouts extends Component {
@@ -13,80 +14,80 @@ class Playouts extends Component {
         main: [],
         backup: [],
         trimmed: [],
-        //date: moment().format('YYYY-MM'),
-        //startDate: moment(),
+        date: new Date().toLocaleDateString('sv'),
+        startDate: new Date(),
         files: [],
         file_data: "",
         file_name: "",
         playout: {},
         id: "",
-        status: "",
+        status: "Off",
         source: "",
         trim_meta: {},
-        src: "ShiurBoker",
+        src: "Workflow",
         year: "2020",
         month: "01",
     };
 
     componentDidMount() {
+        this.props.onRef(this)
         const {id,playouts} = this.props;
         if(id)
             this.setPlayout(id, playouts[id]);
     };
 
-    getWorkflow = () => {
-        const {src, year, month, playout} = this.state;
-        let file_path = `/backup/__BACKUP/${year}-${month}/${src}`
-        console.log(":: Set File Path: ",file_path);
-        let req = {"req":"files", "id":"status", file_path};
-        streamFetcher(playout.ip, `playout`, req,  (data) => {
-            //let status = data.stdout.replace(/\n/ig, '');
-            let files = JSON.parse(data.stdout)
-            this.setState({files});
+    componentWillUnmount() {
+        this.props.onRef(undefined)
+        clearInterval(this.state.ival);
+    };
+
+    getStat = () => {
+        mqtt.send("status", false, "exec/service/gst-play-1/sdi");
+    };
+
+    onMqttMessage = (message, topic) => {
+        const local = true
+        const src = local ? topic.split("/")[3] : topic.split("/")[4];
+        console.log("[playout] Message: ", message);
+        if(message.action === "status") {
+            const status = message.data.alive ? "On" : "Off";
+            this.setState({status});
+        }
+    };
+
+    getWorkflow = (date) => {
+        getWorkflowData(`source/find?key=date&value=${this.state.date}`, (data) => {
+            console.log(":: Got workflow: ",data);
+            this.setState({files: data})
         });
     };
 
-    selectFile = (file) => {
-        console.log(":: Select file: ",file);
-        const {src, year, month} = this.state;
-        let file_path = `/backup/__BACKUP/${year}-${month}/${src}/${file}`
-        this.setJsonState("file_path", file_path);
-        this.setState({source: file_path, file_data: file, file_name: file, disabled: false});
-        let file_name = file.split('.')[0];
-        getWorkflowData(`trimmer/find?key=file_name&value=${file_name}`, (data) => {
-            let chk = data.filter(b => b.original.languages);
-            if(chk.length > 0) {
-                console.log(":: Got workflow: ",data);
-                console.log(":: Filter: ",chk);
-            } else {
-                console.log(":: File or languages not found in workflow :");
-            }
-        });
+    selectFile = (data) => {
+        console.log(":: Select file: ", data);
+        const {src, id, playout, date} = this.state;
+        let file_path = `/backup/files/sources/${date.split('-').join('/')}/${data.file_name}`
+        playout.jsonst.file_name = data.file_name;
+        playout.jsonst.source_id = data.source_id;
+        playout.jsonst.file_path = file_path;
+        this.props.jsonState("playouts", {[id]: playout}, id);
+        this.setState({source: file_path, file_data: data, file_name: data.file_name, disabled: false});
     };
 
     setSrc = (src) => {
         this.setState({src, disabled: true, file_data: ""});
     };
 
-    setYear = (year) => {
-        this.setState({year});
+    changeDate = (data) => {
+        let date = data.toLocaleDateString('sv');
+        this.setState({startDate: data, date});
     };
-
-    setMonth = (month) => {
-        this.setState({month});
-    }
 
     setPlayout = (id, playout) => {
         console.log(":: Set Playout: ",playout);
         this.setState({id, playout});
-        let req = {"req":"strstat", "id":"status"};
-        streamFetcher(playout.ip, `playout`, req,  (data) => {
-            let status = data.stdout.replace(/\n/ig, '');
-            console.log(":: Got playout status: ",status);
-            this.setState({status});
-        });
         if(id !== this.props.id)
             this.props.idState("playout_id", id);
+        this.getStat()
     };
 
     setJsonState = (key, value) => {
@@ -97,29 +98,12 @@ class Playouts extends Component {
 
     startPlayout = () => {
         this.setState({status: "On"});
-        let {playout,file_data} = this.state;
-        this.setJsonState("file_name", file_data.file_name);
-        let {jsonst} = playout;
-        jsonst.id = "stream";
-        jsonst.req = "start";
-        streamFetcher(playout.ip, `playout`, jsonst,  (data) => {
-            //let status = data.stdout.replace(/\n/ig, '');
-            console.log(":: Start Playout status: ",data);
-            //TODO: here we need save state to db
-        });
+        mqtt.send("start", false, "exec/service/gst-play-1/sdi");
     };
 
     stopPlayout = () => {
         this.setState({status: "Off", file_name: null});
-        this.setJsonState("file_name", null);
-        let {playout} = this.state;
-        let {jsonst} = playout;
-        jsonst.id = "stream";
-        jsonst.req = "stop";
-        streamFetcher(playout.ip, `playout`, jsonst,  (data) => {
-            //let status = data.stdout.replace(/\n/ig, '');
-            console.log(":: Stop Playout status: ",data);
-        });
+        mqtt.send("stop", false, "exec/service/gst-play-1/sdi");
     };
 
     render() {
@@ -138,13 +122,12 @@ class Playouts extends Component {
         });
 
         let files_list = files.map((data, i) => {
-            return ({ key: i, text: data, value: data })
+            return ({ key: i, text: data.file_name, value: data })
         });
 
         const src_options = [
-            { key: 1, text: 'ShiurBoker', value: 'ShiurBoker' },
-            { key: 2, text: 'Special', value: 'Special' },
-            { key: 3, text: 'Rawmaterial', value: 'Rawmaterial' },
+            { key: 1, text: 'Workflow', value: 'Workflow' },
+            { key: 2, text: 'Backup', value: 'Backup' },
         ];
 
         const year_options = [
@@ -188,24 +171,24 @@ class Playouts extends Component {
                     </Table.Header>
 
                     <Table.Body>
-                        <Table.Row>
-                            <Table.Cell>Channels</Table.Cell>
-                            <Table.Cell>
-                                <Select disabled={!id}
-                                        compact options={langch_options}
-                                        value={id ? playouts[id].jsonst.channels : ""}
-                                        onChange={(e, {value}) => this.setJsonState("channels", value)}
-                                />
-                            </Table.Cell>
-                            <Table.Cell>Format</Table.Cell>
-                            <Table.Cell>
-                                <Select disabled={!id}
-                                        compact options={vres_options}
-                                        value={id ? playouts[id].jsonst.vres : ""}
-                                        onChange={(e, {value}) => this.setJsonState("vres", value)}
-                                />
-                            </Table.Cell>
-                        </Table.Row>
+                        {/*<Table.Row>*/}
+                        {/*    <Table.Cell>Channels</Table.Cell>*/}
+                        {/*    <Table.Cell>*/}
+                        {/*        <Select disabled={!id}*/}
+                        {/*                compact options={langch_options}*/}
+                        {/*                value={id ? playouts[id].jsonst.channels : ""}*/}
+                        {/*                onChange={(e, {value}) => this.setJsonState("channels", value)}*/}
+                        {/*        />*/}
+                        {/*    </Table.Cell>*/}
+                        {/*    <Table.Cell>Format</Table.Cell>*/}
+                        {/*    <Table.Cell>*/}
+                        {/*        <Select disabled={!id}*/}
+                        {/*                compact options={vres_options}*/}
+                        {/*                value={id ? playouts[id].jsonst.vres : ""}*/}
+                        {/*                onChange={(e, {value}) => this.setJsonState("vres", value)}*/}
+                        {/*        />*/}
+                        {/*    </Table.Cell>*/}
+                        {/*</Table.Row>*/}
                         <Table.Row>
                             <Table.Cell>Source</Table.Cell>
                             <Table.Cell>
@@ -215,23 +198,34 @@ class Playouts extends Component {
                                     className="trim_src_dropdown"
                                     selection
                                     options={src_options}
-                                    defaultValue="ShiurBoker"
+                                    defaultValue="Workflow"
                                     onChange={(e, {value}) => this.setSrc(value)}
                                 >
                                 </Dropdown>
                             </Table.Cell>
                             <Table.Cell>Date</Table.Cell>
                             <Table.Cell>
-                                <Select disabled={!id}
-                                        compact options={year_options}
-                                        value={year}
-                                        onChange={(e, {value}) => this.setYear(value)}
+                                <DatePicker
+                                    className="datepickercs"
+                                    dateFormat="yyyy-MM-dd"
+                                    // locale={he}
+                                    showYearDropdown
+                                    showMonthDropdown
+                                    scrollableYearDropdown
+                                    maxDate={new Date()}
+                                    selected={this.state.startDate}
+                                    onChange={this.changeDate}
                                 />
-                                <Select disabled={!id}
-                                        compact options={month_options}
-                                        value={month}
-                                        onChange={(e, {value}) => this.setMonth(value)}
-                                />
+                                {/*<Select disabled={!id}*/}
+                                {/*        compact options={year_options}*/}
+                                {/*        value={year}*/}
+                                {/*        onChange={(e, {value}) => this.setYear(value)}*/}
+                                {/*/>*/}
+                                {/*<Select disabled={!id}*/}
+                                {/*        compact options={month_options}*/}
+                                {/*        value={month}*/}
+                                {/*        onChange={(e, {value}) => this.setMonth(value)}*/}
+                                {/*/>*/}
                             </Table.Cell>
                         </Table.Row>
                     </Table.Body>

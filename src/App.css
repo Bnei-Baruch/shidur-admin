@@ -1,6 +1,10 @@
 .App {
      text-align: center;
- }
+}
+
+.ui.text.container {
+    max-width: 850px!important;
+}
 
 .vu {
     padding: 0.1em 0.5em!important;
