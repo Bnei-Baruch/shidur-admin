@@ -81,7 +81,7 @@ class Service extends Component {
                     </Menu.Item>
                     <Menu.Item>
                         <Label size='big' color='grey'>
-                            {id}
+                            {description || id}
                         </Label>
                     </Menu.Item>
                     <Menu.Item>

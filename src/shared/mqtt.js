@@ -84,7 +84,15 @@ class MqttMsg {
     watch = (callback, stat) => {
         this.mq.on('message',  (topic, data, packet) => {
             let cd = packet?.properties?.correlationData ? " | transaction: " + packet?.properties?.correlationData?.toString() : ""
-            log.debug("%c[mqtt] <-- receive message" + cd + " | topic : " + topic, "color: darkgrey", JSON.parse(data));
+            let msg
+            try {
+                msg = JSON.parse(data);
+                log.debug("%c[mqtt] <-- receive message" + cd + " | topic : " + topic, "color: darkgrey", msg);
+            } catch (e) {
+                log.debug("%c[mqtt] <-- receive message" + cd + " | topic : " + topic, "color: darkgrey", data.toString());
+                return
+            }
+
             const t = topic.split("/")
             const [root, service, id, target] = t
             switch(root) {
