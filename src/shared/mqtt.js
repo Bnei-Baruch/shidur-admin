@@ -90,6 +90,7 @@ class MqttMsg {
                 log.debug("%c[mqtt] <-- receive message" + cd + " | topic : " + topic, "color: darkgrey", msg);
             } catch (e) {
                 log.debug("%c[mqtt] <-- receive message" + cd + " | topic : " + topic, "color: darkgrey", data.toString());
+                callback(data.toString(), topic);
                 return
             }
 

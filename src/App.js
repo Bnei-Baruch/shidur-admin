@@ -15,6 +15,7 @@ import Settings from "./components/Settings";
 import Workflow from "./components/Workflow";
 import WebRTC from "./components/WebRTC";
 import Galaxy from "./components/Galaxy";
+import Monitor from "./components/Monitor";
 //import UDP from "./components/UDP";
 
 class App extends Component {
@@ -26,6 +27,7 @@ class App extends Component {
         playouts:{},
         workflows:{},
         restream:{},
+        streamer:{},
         encoder_id: null,
         decoder_id: null,
         capture_id: null,
@@ -47,7 +49,7 @@ class App extends Component {
             getData(`streamer`, (streamer) => {
                 console.log(":: Got streamer: ",streamer);
                 const {encoders,decoders,captures,playouts,workflows,restream} = streamer;
-                this.setState({encoders,decoders,captures,playouts,workflows,restream});
+                this.setState({encoders,decoders,captures,playouts,workflows,restream,streamer});
                 mqtt.init(user, (data) => {
                     console.log("[mqtt] init: ", data);
                     const watch = 'exec/service/data/#';
@@ -96,6 +98,10 @@ class App extends Component {
       const panes = [
           { menuItem: { key: 'Home', icon: 'home', content: 'Home', disabled: false },
               render: () => <Tab.Pane attached={true} >{login}</Tab.Pane> },
+          { menuItem: { key: 'monitor', icon: 'chart line', content: 'Monitor', disabled: !shidur_root },
+              render: () => <Tab.Pane attached={false} >
+                  <Monitor streamer={this.state.streamer} onRef={ref => (this.cap = ref)} user={user} />
+              </Tab.Pane> },
           { menuItem: { key: 'restream', icon: 'sitemap', content: 'LiveProxy', disabled: !shidur_admin },
               render: () => <Tab.Pane attached={false} >
                   <Restreamer jsonState={this.setJsonState}
