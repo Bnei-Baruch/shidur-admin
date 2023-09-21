@@ -23,6 +23,12 @@ class Galaxy extends Component {
         const {encoders} = this.props;
         const id = "galaxy-test";
         this.setEncoder(id, encoders[id]);
+        if(id === "galaxy-test") {
+            getRooms(data => {
+                //let rooms = data.rooms.filter(r => r.janus === "gxy9");
+                this.setState({rooms: data.rooms})
+            });
+        }
     };
 
     componentWillUnmount() {
@@ -45,12 +51,6 @@ class Galaxy extends Component {
 
     setEncoder = (id, encoder) => {
         console.log(":: Set encoder: ",encoder);
-        if(id === "galaxy-test") {
-            getRooms(data => {
-                let rooms = data.rooms.filter(r => r.janus === "gxy9");
-                this.setState({rooms})
-            });
-        }
         this.setState({id, encoder}, () => {
             this.runTimer();
         });
@@ -65,9 +65,9 @@ class Galaxy extends Component {
         }
         const id = "janus-" + (encoder.services.length + 1).toString();
         const description = room.description;
-        const cmd = `janus.py --play-from video.mp4 --room ${room.room} https://gxy9.kab.sh/janusgxy`;
+        const cmd = `-room=${room.room}`;
         const args = cmd.split(" ");
-        encoder.services.push({description, id, name: "python3", args});
+        encoder.services.push({description, id, name: "webrtc-encoder", args});
         this.saveData(encoder)
     };
 
