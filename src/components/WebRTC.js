@@ -8,7 +8,7 @@ import mqtt from "../shared/mqtt";
 class WebRTC extends Component {
 
     state = {
-        id: "udp-proxy",
+        id: "media-proxy-1",
         services: [],
         conf: {},
         sadna: {},
@@ -122,7 +122,7 @@ class WebRTC extends Component {
     };
 
     getStat = () => {
-        mqtt.send("status", false, "exec/service/udp-proxy");
+        mqtt.send("status", false, "exec/service/media-proxy-1");
         // getService("udp-proxy/status", (services) => {
         //     for(let i=0; i<services.length; i++) {
         //         //services[i].out_time = services[i].log.split('time=')[1].split('.')[0];
@@ -235,7 +235,7 @@ class WebRTC extends Component {
         const x = (<Icon color='red' name='close' />);
 
         let services_list = services.map((stream,i) => {
-            return (<Service key={i} index={i} service={services[i]} id="udp-proxy" saveData={this.saveData} />);
+            return (<Service key={i} index={i} service={services[i]} id="media-proxy-1" saveData={this.saveData} />);
         });
 
         let sadna_options = Object.keys(sadna).map((id, i) => {
