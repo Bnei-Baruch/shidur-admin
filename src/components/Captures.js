@@ -37,13 +37,9 @@ class Captures extends Component {
         if(this.state.id)
         if(services && this.state.id === src) {
             for(let i=0; i<services.length; i++) {
-                //services[i].out_time = services[i].log.split('time=')[1].split('.')[0];
                 services[i].out_time = toHms(services[i].runtime);
+                this.setState({services});
             }
-            //console.debug("[capture] Message: ", services);
-            this.setState({services});
-        // } else {
-        //     this.setState({services: []});
         }
     };
 
