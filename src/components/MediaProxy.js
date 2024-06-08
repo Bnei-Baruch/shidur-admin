@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
-import {Divider, Segment, Label, Button, Select} from 'semantic-ui-react'
-import {getRooms, getService, getStreamUrl, id_options, putData, rstr_options, toHms} from "../shared/tools";
+import {Divider, Segment, Label} from 'semantic-ui-react'
+import {toHms} from "../shared/tools";
 import Service from "./Service";
 import mqtt from "../shared/mqtt";
 
@@ -56,7 +56,7 @@ class MediaProxy extends Component {
 
         Object.keys(services).map(src => {
             services_list.push(services[src]?.map((stream,i) => {
-                return (<Segment><Label size='massive'>{src}</Label><Service key={src} index={i} service={services[src][i]} id={src}
+                return (<Segment><Label attached='top' size='big'>{src}</Label><Divider /><Service key={src} index={i} service={services[src][i]} id={src}
                                  saveData={this.saveData} removeRestream={this.delRestream} addNote={this.addNote} /></Segment>);
             }))
         })
