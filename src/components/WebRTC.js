@@ -27,7 +27,7 @@ class WebRTC extends Component {
         this.props.onRef(this)
         //this.statusProxy();
         this.getConf();
-        this.runTimer()
+        //this.runTimer()
     };
 
     componentWillUnmount() {
@@ -473,18 +473,6 @@ class WebRTC extends Component {
                     </Menu>
                 </Modal.Actions>
             </Modal>
-
-                {services_list}
-
-                {/*<Message className='or_buttons' >*/}
-                {/*    <Button.Group >*/}
-                {/*        <Button positive disabled={status !== "Off"}*/}
-                {/*                onClick={this.startProxy}>Start</Button>*/}
-                {/*        <Button.Or text='udp' />*/}
-                {/*        <Button negative disabled={status !== "On"}*/}
-                {/*                onClick={this.stopProxy}>Stop</Button>*/}
-                {/*    </Button.Group>*/}
-                {/*</Message>*/}
             </Fragment>
         );
     }

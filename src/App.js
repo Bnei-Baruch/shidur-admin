@@ -8,14 +8,14 @@ import {kc} from "./components/UserManager";
 import {getData, putData} from "./shared/tools";
 import LiveProxy from "./components/LiveProxy";
 import Encoders from "./components/Encoders";
-import Decoders from "./components/Decoders";
+//import Decoders from "./components/Decoders";
 import Captures from "./components/Captures";
 import Playouts from "./components/Playouts";
 import Settings from "./components/Settings";
-import Workflow from "./components/Workflow";
+//import Workflow from "./components/Workflow";
 import WebRTC from "./components/WebRTC";
 import Galaxy from "./components/Galaxy";
-import Monitor from "./components/Monitor";
+import MediaProxy from "./components/MediaProxy";
 //import UDP from "./components/UDP";
 
 class App extends Component {
@@ -98,9 +98,12 @@ class App extends Component {
       const panes = [
           { menuItem: { key: 'Home', icon: 'home', content: 'Home', disabled: false },
               render: () => <Tab.Pane attached={true} >{login}</Tab.Pane> },
-          { menuItem: { key: 'monitor', icon: 'chart line', content: 'Monitor', disabled: !shidur_root },
+          { menuItem: { key: 'mpx', icon: 'compress', content: 'MediaProxy', disabled: !shidur_admin },
               render: () => <Tab.Pane attached={false} >
-                  <Monitor streamer={this.state.streamer} onRef={ref => (this.cap = ref)} user={user} />
+                  <MediaProxy jsonState={this.setJsonState}
+                             idState={this.setIdState}
+                             id={restream_id}
+                             restream={restream} onRef={ref => (this.cap = ref)} />
               </Tab.Pane> },
           { menuItem: { key: 'restream', icon: 'sitemap', content: 'LiveProxy', disabled: !shidur_admin },
               render: () => <Tab.Pane attached={false} >
