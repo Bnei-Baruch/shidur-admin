@@ -4,7 +4,7 @@ import {getRooms, getService, getStreamUrl, id_options, putData, rstr_options, t
 import Service from "./Service";
 import mqtt from "../shared/mqtt";
 
-class Restreamer extends Component {
+class LiveProxy extends Component {
 
     state = {
         restream: {},
@@ -12,7 +12,6 @@ class Restreamer extends Component {
         ival: null,
         services: [],
         status: "",
-
         description: "",
         name: "",
         language: "heb",
@@ -137,4 +136,4 @@ class Restreamer extends Component {
     }
 }
 
-export default Restreamer;
+export default LiveProxy;

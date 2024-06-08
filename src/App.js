@@ -6,7 +6,7 @@ import LoginPage from './components/LoginPage';
 import mqtt from "./shared/mqtt";
 import {kc} from "./components/UserManager";
 import {getData, putData} from "./shared/tools";
-import Restreamer from "./components/Restreamer";
+import LiveProxy from "./components/LiveProxy";
 import Encoders from "./components/Encoders";
 import Decoders from "./components/Decoders";
 import Captures from "./components/Captures";
@@ -104,10 +104,10 @@ class App extends Component {
               </Tab.Pane> },
           { menuItem: { key: 'restream', icon: 'sitemap', content: 'LiveProxy', disabled: !shidur_admin },
               render: () => <Tab.Pane attached={false} >
-                  <Restreamer jsonState={this.setJsonState}
-                            idState={this.setIdState}
-                            id={restream_id}
-                            restream={restream} onRef={ref => (this.cap = ref)} />
+                  <LiveProxy jsonState={this.setJsonState}
+                             idState={this.setIdState}
+                             id={restream_id}
+                             restream={restream} onRef={ref => (this.cap = ref)} />
               </Tab.Pane> },
           { menuItem: { key: 'galaxy', icon: 'users', content: 'Galaxy', disabled: !shidur_galaxy },
               render: () => <Tab.Pane attached={false} >
