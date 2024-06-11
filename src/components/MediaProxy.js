@@ -25,8 +25,8 @@ class MediaProxy extends Component {
         const {services} = this.state;
         const local = true
         const src = local ? topic.split("/")[3] : topic.split("/")[4];
-        //console.debug("["+src+"] Message: ", message);
-        if(src.match(/^(media-proxy-1|media-proxy-2)$/)) {
+        console.debug("["+src+"] Message: ", message);
+        if(src.match(/^(media-proxy-1|media-proxy-2)$/) && message?.action === "status") {
             services[src] = message.data;
             for(let i=0; i<services[src].length; i++) {
                 services[src][i].out_time = toHms(services[src][i].runtime);
