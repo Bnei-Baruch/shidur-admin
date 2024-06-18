@@ -16,6 +16,7 @@ import Settings from "./components/Settings";
 import WebRTC from "./components/WebRTC";
 import Galaxy from "./components/Galaxy";
 import MediaProxy from "./components/MediaProxy";
+import StreamProxy from "./components/StreamProxy";
 //import UDP from "./components/UDP";
 
 class App extends Component {
@@ -112,6 +113,13 @@ class App extends Component {
                              id={restream_id}
                              restream={restream} onRef={ref => (this.cap = ref)} />
               </Tab.Pane> },
+          { menuItem: { key: 'stream', icon: 'rss', content: 'StreamProxy', disabled: !shidur_admin },
+              render: () => <Tab.Pane attached={false} >
+                  <StreamProxy jsonState={this.setJsonState}
+                             idState={this.setIdState}
+                             id={restream_id}
+                             restream={restream} onRef={ref => (this.cap = ref)} />
+              </Tab.Pane> },
           { menuItem: { key: 'galaxy', icon: 'users', content: 'Galaxy', disabled: !shidur_galaxy },
               render: () => <Tab.Pane attached={false} >
                   <Galaxy jsonState={this.setJsonState}
@@ -172,7 +180,7 @@ class App extends Component {
       const shidur_panes = panes.filter(p => !p.menuItem.disabled);
 
     return (
-        <Container text>
+        <Container>
             <Tab menu={{ secondary: true, pointing: true, color: "blue"}} panes={shidur_panes} />
         </Container>
     );
