@@ -19,6 +19,7 @@ export const KC_URL = process.env.REACT_APP_KC_URL;
 //export const MQTT_URL = process.env.REACT_APP_MQTT_LCL_URL;
 export const MQTT_URL = process.env.REACT_APP_MQTT_LCL_URL;
 export const STUN_SRV_GXY = process.env.REACT_APP_STUN_SRV_GXY;
+export const STREAM_PROXY_URL = process.env.REACT_APP_STREAM_PROXY_URL
 
 var p = {};
 

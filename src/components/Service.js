@@ -75,13 +75,13 @@ class Service extends Component {
             <Message className='service' floating >
                 <Menu secondary>
                     <Menu.Item>
-                        <Checkbox toggle disabled={delay || (this.props.id === "live-proxy" && !description)}
+                        <Checkbox toggle disabled={delay || (this.props.id.match(/^(live-proxy|stream-proxy)$/) && !description)}
                                   checked={alive}
                                   onChange={this.toggleStream} />
                     </Menu.Item>
                     <Menu.Item>
                         <Label size='big' color='grey'>
-                            {this.props.id === "live-proxy" ? id : description || id}
+                            {this.props.id.match(/^(live-proxy|stream-proxy)$/) ? id : description || id}
                         </Label>
                     </Menu.Item>
                     <Menu.Item>
@@ -112,7 +112,7 @@ class Service extends Component {
                         </Label>
                     </Menu.Item>
                     <Menu.Item position='right'>
-                        {this.props.id.match(/^(live-proxy|galaxy-test)$/) ? <Icon link name='close' onClick={this.removeStream} /> : null}
+                        {this.props.id.match(/^(live-proxy|stream-proxy|galaxy-test)$/) ? <Icon link name='close' onClick={this.removeStream} /> : null}
                     </Menu.Item>
                 </Menu>
             </Message>

@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 import {Divider, Segment, Label, Button, Select} from 'semantic-ui-react'
-import {getRooms, getService, getStreamUrl, id_options, putData, rstr_options, toHms} from "../shared/tools";
+import {getService, id_options, putData, rstr_options, STREAM_PROXY_URL, toHms} from "../shared/tools";
 import Service from "./Service";
 import mqtt from "../shared/mqtt";
 
@@ -69,12 +69,10 @@ class StreamProxy extends Component {
         const {restream} = this.props;
         const {id} = this.state;
         restream[id].services[i].description = description;
-        getStreamUrl(this.state.language, url => {
-            let cmd = `-progress stat_${id}.log -hide_banner -re -i ${url} -c:v copy -c:a libfdk_aac -b:a 64k -f flv ${description}`
-            let arg = cmd.split(" ");
-            restream[id].services[i].args = arg;
-            this.saveData(restream[id])
-        });
+        let cmd = `-progress stat_${id}.log -hide_banner -rtsp_transport tcp -i ${STREAM_PROXY_URL} -c copy -f flv ${description}`
+        let arg = cmd.split(" ");
+        restream[id].services[i].args = arg;
+        this.saveData(restream[id])
     };
 
     saveData = (props) => {
@@ -99,7 +97,7 @@ class StreamProxy extends Component {
             clearInterval(this.state.ival);
         let ival = setInterval(() => {
             this.getStat();
-        }, 10000);
+        }, 1000);
         this.setState({ival});
     };
 
