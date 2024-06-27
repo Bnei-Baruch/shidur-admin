@@ -38,6 +38,7 @@ class App extends Component {
         shidur_admin: false,
         shidur_root: false,
         shidur_galaxy: false,
+        shidur_stream: false,
         user: null,
     };
 
@@ -45,8 +46,9 @@ class App extends Component {
         const shidur_admin = kc.hasRealmRole("shidur_admin");
         const shidur_root = kc.hasRealmRole("shidur_root");
         const shidur_galaxy = kc.hasRealmRole("shidur_galaxy");
-        if(shidur_root || shidur_admin || shidur_galaxy) {
-            this.setState({user, shidur_admin, shidur_root, shidur_galaxy});
+        const shidur_stream = kc.hasRealmRole("shidur_stream");
+        if(shidur_root || shidur_admin || shidur_galaxy || shidur_stream) {
+            this.setState({user, shidur_admin, shidur_root, shidur_galaxy, shidur_stream});
             getData(`streamer`, (streamer) => {
                 console.log(":: Got streamer: ",streamer);
                 const {encoders,decoders,captures,playouts,workflows,restream} = streamer;
@@ -92,7 +94,7 @@ class App extends Component {
 
   render() {
 
-      const {user,shidur_admin,shidur_root,shidur_galaxy,encoders,decoders,captures,playouts,workflows,restream,encoder_id,decoder_id,capture_id,playout_id,workflow_id,restream_id} = this.state;
+      const {user,shidur_admin,shidur_root,shidur_galaxy,shidur_stream,encoders,decoders,captures,playouts,workflows,restream,encoder_id,decoder_id,capture_id,playout_id,workflow_id,restream_id} = this.state;
 
       let login = (<LoginPage user={user} checkPermission={this.checkPermission} />);
 
@@ -113,7 +115,7 @@ class App extends Component {
                              id={restream_id}
                              restream={restream} onRef={ref => (this.cap = ref)} />
               </Tab.Pane> },
-          { menuItem: { key: 'stream', icon: 'rss', content: 'StreamProxy', disabled: !shidur_admin },
+          { menuItem: { key: 'stream', icon: 'rss', content: 'StreamProxy', disabled: !shidur_stream },
               render: () => <Tab.Pane attached={false} >
                   <StreamProxy jsonState={this.setJsonState}
                              idState={this.setIdState}
