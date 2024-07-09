@@ -101,7 +101,7 @@ class App extends Component {
       const panes = [
           { menuItem: { key: 'Home', icon: 'home', content: 'Home', disabled: false },
               render: () => <Tab.Pane attached={true} >{login}</Tab.Pane> },
-          { menuItem: { key: 'mpx', icon: 'compress', content: 'MediaProxy', disabled: !shidur_admin },
+          { menuItem: { key: 'mpx', icon: 'compress', content: 'MediaProxy', disabled: !shidur_root },
               render: () => <Tab.Pane attached={false} >
                   <MediaProxy jsonState={this.setJsonState}
                              idState={this.setIdState}
