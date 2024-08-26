@@ -32,8 +32,10 @@ class Playouts extends Component {
     componentDidMount() {
         this.props.onRef(this)
         const {id,playouts} = this.props;
-        if(id)
+        if(id) {
+            //this.getWorkflow();
             this.setPlayout(id, playouts[id]);
+        }
     };
 
     componentWillUnmount() {
@@ -63,12 +65,16 @@ class Playouts extends Component {
     };
 
     selectFile = (data) => {
+        if(/_achana_/.test(data.file_name)) {
+            return
+        }
         console.log(":: Select file: ", data);
         const {src, id, playout, date} = this.state;
         let file_path = `/backup/files/sources/${date.split('-').join('/')}/${data.file_name}`
         playout.jsonst.file_name = data.file_name;
         playout.jsonst.source_id = data.source_id;
         playout.jsonst.file_path = file_path;
+        console.log(playout.jsonst);
         this.props.jsonState("playouts", {[id]: playout}, id);
         this.setState({source: file_path, file_data: data, file_name: data.file_name, disabled: false});
     };
@@ -80,6 +86,7 @@ class Playouts extends Component {
     changeDate = (data) => {
         let date = data.toLocaleDateString('sv');
         this.setState({startDate: data, date});
+        //this.getWorkflow(date);
     };
 
     setPlayout = (id, playout) => {
