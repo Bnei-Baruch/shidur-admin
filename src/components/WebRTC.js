@@ -17,6 +17,7 @@ class WebRTC extends Component {
         video: {},
         special: {},
         servers: {},
+        str: {},
         open: false,
         source: "",
         new_prop: false,
@@ -38,8 +39,8 @@ class WebRTC extends Component {
     getConf = () => {
         getData(`webrtc`, (webrtc) => {
             console.log(":: Got webrtc : ",webrtc);
-            const {sadna,sound,trlout,video,special,servers} = webrtc;
-            this.setState({sadna,sound,trlout,video,special,servers});
+            const {sadna,sound,trlout,video,special,servers,str} = webrtc;
+            this.setState({sadna,sound,trlout,video,special,servers,str});
         });
     };
 
@@ -49,6 +50,8 @@ class WebRTC extends Component {
             conf = {language: "", title: "", proxy_port: "", janus_port: "", janus_id: "", enabled: true}
         } else if(source === "servers") {
             conf = {role: "", title: "", dns: "", ip: "", enabled: true}
+        } else if(source === "str") {
+            conf = {name: "", dns: "", online: true, enabled: true}
         } else {
             conf = {language: "", proxy_port: "", janus_port: "", janus_id: "", ffmpeg_channel: "", enabled: true}
         }
@@ -199,6 +202,29 @@ class WebRTC extends Component {
                     </Table.Body>
                 </Table>
             )
+        } else if(source === "str") {
+            let {name, dns, online, enable} = conf;
+            return (
+                <Table compact='very' basic size='small'>
+                    <Table.Header>
+                        <Table.Row className='table_header'>
+                            <Table.HeaderCell width={1}>Nmae</Table.HeaderCell>
+                            <Table.HeaderCell width={1}>DNS</Table.HeaderCell>
+                            <Table.HeaderCell width={1}>Oniline</Table.HeaderCell>
+                            <Table.HeaderCell width={1}>Enable</Table.HeaderCell>
+                        </Table.Row>
+                    </Table.Header>
+
+                    <Table.Body>
+                        <Table.Row className="monitor_tr">
+                            <Table.Cell><Input size='mini' value={name} onChange={(e) => this.setValue("name", e.target.value)} /></Table.Cell>
+                            <Table.Cell><Input size='mini' value={dns} onChange={(e) => this.setValue("dns", e.target.value)} /></Table.Cell>
+                            <Table.Cell><Checkbox disabled checked={true} /></Table.Cell>
+                            <Table.Cell><Checkbox onClick={() => this.setValue("enable", !enable)} checked={enable} /></Table.Cell>
+                        </Table.Row>
+                    </Table.Body>
+                </Table>
+            )
         } else {
             let {language, proxy_port, janus_port, janus_id, ffmpeg_channel, enabled} = conf;
             return (
@@ -230,7 +256,7 @@ class WebRTC extends Component {
     };
 
     render() {
-        const {sadna,sound,trlout,video,special,servers,open,source,new_prop,services} = this.state;
+        const {str, sadna,sound,trlout,video,special,servers,open,source,new_prop,services} = this.state;
         const v = (<Icon color='green' name='checkmark' />);
         const x = (<Icon color='red' name='close' />);
 
@@ -317,6 +343,19 @@ class WebRTC extends Component {
                     <Table.Cell>{conf.ip}</Table.Cell>
                     <Table.Cell>{conf.role}</Table.Cell>
                     <Table.Cell>{conf.enabled ? v : x}</Table.Cell>
+                </Table.Row>
+            )
+        });
+
+        let str_options = Object.keys(str).map((id, i) => {
+            let conf = str[id];
+            console.log("STR", conf)
+            return (
+                <Table.Row key={i} className="monitor_tr" onClick={() => this.editProp('str', false, conf)}>
+                    <Table.Cell>{conf.name}</Table.Cell>
+                    <Table.Cell>{conf.dns}</Table.Cell>
+                    <Table.Cell>{conf.online ? v : x}</Table.Cell>
+                    <Table.Cell>{conf.enable ? v : x}</Table.Cell>
                 </Table.Row>
             )
         });
@@ -440,6 +479,24 @@ class WebRTC extends Component {
                             </Table.Body>
                         </Table>
                         <Button size="mini" fluid onClick={() => this.addNew('servers', true)}>Add....</Button>
+                    </Tab.Pane> },
+            { menuItem: 'StrDB', render: () =>
+                    <Tab.Pane>
+                        <Table compact='very' basic size='small'>
+                            <Table.Header>
+                                <Table.Row className='table_header'>
+                                    <Table.HeaderCell width={1}>Name</Table.HeaderCell>
+                                    <Table.HeaderCell width={1}>DNS</Table.HeaderCell>
+                                    <Table.HeaderCell width={1}>Online</Table.HeaderCell>
+                                    <Table.HeaderCell width={1}>Enabled</Table.HeaderCell>
+                                </Table.Row>
+                            </Table.Header>
+
+                            <Table.Body>
+                                {str_options}
+                            </Table.Body>
+                        </Table>
+                        <Button size="mini" fluid onClick={() => this.addNew('str', true)}>Add....</Button>
                     </Tab.Pane> },
         ]
 
