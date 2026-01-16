@@ -51,7 +51,7 @@ class WebRTC extends Component {
         } else if(source === "servers") {
             conf = {role: "", title: "", dns: "", ip: "", enabled: true}
         } else if(source === "str") {
-            conf = {name: "", dns: "", online: true, enabled: true}
+            conf = {name: "", dns: "", online: true, enabled: true, region: ""}
         } else {
             conf = {language: "", proxy_port: "", janus_port: "", janus_id: "", ffmpeg_channel: "", enabled: true}
         }
@@ -203,13 +203,14 @@ class WebRTC extends Component {
                 </Table>
             )
         } else if(source === "str") {
-            let {name, dns, online, enable} = conf;
+            let {name, dns, online, enable, region} = conf;
             return (
                 <Table compact='very' basic size='small'>
                     <Table.Header>
                         <Table.Row className='table_header'>
                             <Table.HeaderCell width={1}>Nmae</Table.HeaderCell>
                             <Table.HeaderCell width={1}>DNS</Table.HeaderCell>
+                            <Table.HeaderCell width={1}>Region</Table.HeaderCell>
                             <Table.HeaderCell width={1}>Oniline</Table.HeaderCell>
                             <Table.HeaderCell width={1}>Enable</Table.HeaderCell>
                         </Table.Row>
@@ -219,6 +220,7 @@ class WebRTC extends Component {
                         <Table.Row className="monitor_tr">
                             <Table.Cell><Input size='mini' value={name} onChange={(e) => this.setValue("name", e.target.value)} /></Table.Cell>
                             <Table.Cell><Input size='mini' value={dns} onChange={(e) => this.setValue("dns", e.target.value)} /></Table.Cell>
+                            <Table.Cell><Input size='mini' value={region} onChange={(e) => this.setValue("region", e.target.value)} /></Table.Cell>
                             <Table.Cell><Checkbox disabled checked={true} /></Table.Cell>
                             <Table.Cell><Checkbox onClick={() => this.setValue("enable", !enable)} checked={enable} /></Table.Cell>
                         </Table.Row>
@@ -354,6 +356,7 @@ class WebRTC extends Component {
                 <Table.Row key={i} className="monitor_tr" onClick={() => this.editProp('str', false, conf)}>
                     <Table.Cell>{conf.name}</Table.Cell>
                     <Table.Cell>{conf.dns}</Table.Cell>
+                    <Table.Cell>{conf.region}</Table.Cell>
                     <Table.Cell>{conf.online ? v : x}</Table.Cell>
                     <Table.Cell>{conf.enable ? v : x}</Table.Cell>
                 </Table.Row>
@@ -487,6 +490,7 @@ class WebRTC extends Component {
                                 <Table.Row className='table_header'>
                                     <Table.HeaderCell width={1}>Name</Table.HeaderCell>
                                     <Table.HeaderCell width={1}>DNS</Table.HeaderCell>
+                                    <Table.HeaderCell width={1}>Region</Table.HeaderCell>
                                     <Table.HeaderCell width={1}>Online</Table.HeaderCell>
                                     <Table.HeaderCell width={1}>Enabled</Table.HeaderCell>
                                 </Table.Row>
