@@ -72,7 +72,8 @@ class WebRTC extends Component {
     saveProp = () => {
         const {source,conf} = this.state;
         console.log(":: Save item: ", conf);
-        putData(`webrtc/${source}/${conf.language}`, conf, (data) => {
+        const prop = source === "str" ? conf.name : conf.language;
+        putData(`webrtc/${source}/${prop}`, conf, (data) => {
             console.log("saveProp callback: ", data);
             this.setState({open: false, conf: {}});
             this.getConf();
