@@ -55,10 +55,11 @@ class App extends Component {
                 this.setState({encoders,decoders,captures,playouts,workflows,restream,streamer});
                 mqtt.init(user, (data) => {
                     console.log("[mqtt] init: ", data);
-                    const watch = 'exec/service/data/#';
                     const local = true
-                    const topic = local ? watch : 'bb/' + watch;
-                    mqtt.join(topic);
+                    const watch_service = 'exec/service/data/#';
+                    const watch_cmd = 'exec/cmd/data/#';
+                    mqtt.join(local ? watch_service : 'bb/' + watch_service);
+                    mqtt.join(local ? watch_cmd : 'bb/' + watch_cmd);
                     mqtt.watch((message, topic) => {
                         this.cap?.onMqttMessage(message, topic);
                     }, false)
